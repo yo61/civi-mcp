@@ -27,6 +27,9 @@ up since 1 Jan?"). The architecture must extend cleanly to:
   stays sharp.
 - Works against arbitrary Civi schemas (extensions, custom fields, custom
   entities) without code changes.
+- An optional Claude Code skill that gives the agent CiviCRM workflow
+  heuristics, domain mental model, and common query patterns — opt-in for
+  Claude Code users; the MCP server stays universal.
 - TypeScript that is approachable for someone learning the language: explicit,
   idiomatic, strict-typed.
 
@@ -188,9 +191,110 @@ const WhereClauseSchema: z.ZodType<WhereClause> = z.union([
 
 Two of these calls are cached after the first session question.
 
-## 5. CiviCRM client (`Civi4Client`)
+## 5. Companion Claude Code skill
 
-### 5.1 Public surface
+The MCP server gives the agent **hands** (typed tool contracts). The skill
+gives it **intuition** (when to use which tool, how CiviCRM is structured,
+common query shapes). They are complementary: the MCP works in any MCP
+client; the skill is an opt-in companion for Claude Code users that materially
+improves results.
+
+### 5.1 Seam between skill and MCP
+
+To keep the two artifacts from drifting:
+
+- **MCP `describe_entity.queryHints`** carries *per-entity, schema-specific*
+  guidance (pseudo-constant suffix, date format, dot-notation joins). These
+  are generated from the live schema and are always current.
+- **Skill** carries *cross-entity, workflow-level, conceptual* guidance — the
+  things that don't change when an admin installs a new extension.
+
+Rule of thumb: if a hint mentions a specific field, it belongs in
+`queryHints`. If it talks about the agent's approach or CiviCRM as a domain,
+it belongs in the skill.
+
+### 5.2 Skill content (Phase 1)
+
+A single `SKILL.md` plus a small `examples/` directory. Frontmatter follows
+the Claude Code skill format:
+
+```markdown
+---
+name: civicrm
+description: Use when answering analytical or operational questions about a
+  CiviCRM instance — members, contributions, events, contacts, activities.
+  Provides workflow heuristics and common query patterns. Requires the
+  civicrm-mcp MCP server to be configured.
+---
+```
+
+Body sections:
+
+- **When to invoke.** Trigger phrases ("how many members…", "list contacts…",
+  "donations by…"). What to do if the MCP server is unavailable (tell the
+  user; don't try to fabricate answers).
+- **Workflow heuristics.**
+  - Start with `civicrm_list_entities` if you don't recognise an entity name
+    from the user's question.
+  - Cache `describe_entity` results — call once per entity per session.
+  - For "how many" questions, prefer `civicrm_count` over `civicrm_get`.
+  - For "list me…" or "show me…" set `limit` explicitly to match user intent.
+  - When the user names a status, type, or category in plain English, query
+    via the `:name` or `:label` pseudo-constant suffix, not the numeric id.
+- **CiviCRM mental model.** A short, accurate description of:
+  - **Contact** as the root entity (Individual / Organization / Household).
+  - **Membership** = a Contact's relationship to a MembershipType, with a
+    status that's auto-recalculated by Civi.
+  - **Contribution** = a financial transaction linked to a Contact (and
+    optionally a Membership, an Event, etc.). Hard credit vs soft credit.
+  - **Activity** = a logged interaction (call, email, meeting). Has a status
+    and an assignee.
+  - **Participant** = a Contact registered for an Event.
+- **Pseudo-constant cheat-sheet** with worked examples.
+- **Gotchas** — `is_deleted` defaults, timezone semantics, custom field
+  naming conventions, soft credit double-counting.
+- **Common query patterns** (links into `examples/`).
+
+### 5.3 Examples
+
+Each example is a short markdown file showing a worked natural-language
+question end-to-end, including the MCP calls and the expected shape of the
+result. Phase 1 examples:
+
+- `examples/active-members.md` — current members of a given type.
+- `examples/donations-by-month.md` — contribution totals grouped by month.
+- `examples/lapsed-members.md` — members whose end_date passed in the last
+  N days.
+- `examples/recent-activity.md` — contacts with activities in the last week.
+
+### 5.4 Installation
+
+The skill is **not** part of the npm package. Installation is a documented
+manual step:
+
+```sh
+# from a clone of civi-mcp-server
+cp -r skills/civicrm ~/.claude/skills/civicrm
+```
+
+A small README at `skills/civicrm/INSTALL.md` documents the path and
+explains how to verify the install (`/skills` listing in Claude Code).
+
+If a Claude Code skill marketplace gains traction later, the skill will be
+republished there; the in-repo copy stays canonical.
+
+### 5.5 Drift-prevention
+
+- A `skills/civicrm/CHANGELOG.md` records skill changes alongside MCP
+  changes. PRs that change MCP tool names, args, or response shapes must
+  also update the skill or explicitly note "no skill change needed".
+- An integration test (`test/integration/skill-consistency.test.ts`) parses
+  the skill's MCP-tool references and asserts each tool name exists in the
+  server's registered tool list. Catches renames at CI time.
+
+## 6. CiviCRM client (`Civi4Client`)
+
+### 6.1 Public surface
 
 `ApiKey` is a branded `string` — a TypeScript idiom for tagging secrets so they
 can't be accidentally interpolated into URLs or logs:
@@ -218,7 +322,7 @@ class Civi4Client {
 }
 ```
 
-### 5.2 Request shape
+### 6.2 Request shape
 
 POST to `${baseUrl}${authxPath}/${Entity}/${action}` with:
 
@@ -227,13 +331,13 @@ POST to `${baseUrl}${authxPath}/${Entity}/${action}` with:
 - Header `X-Requested-With: XMLHttpRequest`
 - Body `{ "params": { ... } }`
 
-### 5.3 Response handling
+### 6.3 Response handling
 
 APIv4 always responds with `{ values: [...], count: N, ... }` on success.
 On error the body contains `{ is_error: 1, error_message: "...", error_code: "..." }`
 which is converted into a typed `CiviApiError`.
 
-### 5.4 Caching
+### 6.4 Caching
 
 - **Type:** `Map<string, Promise<EntityDescribe>>` keyed by entity name.
 - **Storing the promise (not the resolved value)** deduplicates concurrent
@@ -243,7 +347,7 @@ which is converted into a typed `CiviApiError`.
 - **List-of-entities** cached the same way under a sentinel key.
 - **No disk cache in Phase 1.** Add later if restart latency hurts.
 
-## 6. Configuration
+## 7. Configuration
 
 All config from env vars, with CLI overrides for ad-hoc use:
 
@@ -273,13 +377,13 @@ Example Claude Desktop config snippet:
 }
 ```
 
-## 7. Transport
+## 8. Transport
 
 - **Phase 1:** `StdioServerTransport` from `@modelcontextprotocol/sdk`.
 - **Logging:** all logs to **stderr** (`pino` configured with stderr
   destination). stdout is reserved for the JSON-RPC stream.
 
-## 8. Error handling
+## 9. Error handling
 
 Three error classes, all extending `CiviError`:
 
@@ -294,7 +398,7 @@ Inside MCP tool handlers, errors are caught and returned as `isError: true`
 tool results with a structured message. Full errors logged to stderr at
 `error` level. Never swallowed.
 
-## 9. Testing strategy
+## 10. Testing strategy
 
 | Layer | Tool | Scope | Mocks? |
 |---|---|---|---|
@@ -309,7 +413,11 @@ Principles (from global standards):
 - Mock the HTTP boundary, not the client.
 - Verify tests catch failures (break code → test fails → fix).
 
-## 10. Project layout
+## 11. Project layout
+
+The repo holds two related-but-independent artifacts: the npm-published MCP
+server and the manually-installed Claude Code skill. They share docs and a
+changelog but are distributed through different channels.
 
 ```text
 civi-mcp-server/
@@ -318,7 +426,9 @@ civi-mcp-server/
 ├── .oxlintrc.json
 ├── .oxfmt.toml
 ├── .pre-commit-config.yaml       # prek reads this natively
-├── src/
+├── README.md                     # overview + install both artifacts
+│
+├── src/                          # MCP server (published to npm)
 │   ├── cli.ts                    # entry point
 │   ├── config.ts                 # env parsing → typed Config (zod)
 │   ├── civi/
@@ -336,6 +446,23 @@ civi-mcp-server/
 │           ├── describe-entity.ts
 │           ├── get.ts
 │           └── count.ts
+│
+├── skills/                       # Claude Code skill (manual install)
+│   └── civicrm/
+│       ├── SKILL.md              # frontmatter + body (workflow + model)
+│       ├── INSTALL.md            # how to copy into ~/.claude/skills/
+│       ├── CHANGELOG.md          # tracked alongside MCP changes
+│       └── examples/
+│           ├── active-members.md
+│           ├── donations-by-month.md
+│           ├── lapsed-members.md
+│           └── recent-activity.md
+│
+├── docs/
+│   ├── install-mcp.md            # Claude Desktop config snippet, env vars
+│   ├── install-skill.md          # link to skills/civicrm/INSTALL.md
+│   └── superpowers/specs/        # design specs (this file)
+│
 └── test/
     ├── civi/
     │   ├── client.test.ts        # mocked fetch
@@ -343,12 +470,17 @@ civi-mcp-server/
     ├── mcp/
     │   └── tools.test.ts         # mocked Civi4Client (via mocked fetch)
     └── integration/
-        └── live.test.ts          # opt-in real Civi
+        ├── live.test.ts                # opt-in real Civi
+        └── skill-consistency.test.ts   # skill ⇄ MCP tool name parity
 ```
 
-## 11. Tooling & hygiene
+The `skills/` folder is **excluded** from the npm package via `"files"` in
+`package.json`. Skill distribution happens by cloning the repo (or, later, a
+marketplace), not via npm install.
 
-### 11.1 Strict TypeScript
+## 12. Tooling & hygiene
+
+### 12.1 Strict TypeScript
 
 `tsconfig.json` enables (per global standards):
 
@@ -361,7 +493,7 @@ civi-mcp-server/
 - `isolatedModules: true`
 - `module: "NodeNext"`, `target: "ES2024"`
 
-### 11.2 Pre-commit pipeline (`.pre-commit-config.yaml`)
+### 12.2 Pre-commit pipeline (`.pre-commit-config.yaml`)
 
 Standard hygiene suite + project tooling + commit-msg validation + markdown:
 
@@ -416,14 +548,14 @@ Standard hygiene suite + project tooling + commit-msg validation + markdown:
 Versions are pinned but should be refreshed to current stable when
 scaffolding; never assume from memory.
 
-### 11.3 Commit conventions
+### 12.3 Commit conventions
 
 - Conventional Commits enforced on `commit-msg` stage.
 - Imperative mood, ≤ 72 char subject.
 - One logical change per commit.
 - Feature branches only — never commit directly to `main`.
 
-### 11.4 CI (later)
+### 12.4 CI (later)
 
 GitHub Actions workflow runs the same pipeline plus:
 
@@ -431,7 +563,7 @@ GitHub Actions workflow runs the same pipeline plus:
 - `actionlint` and `zizmor` on workflow files
 - Actions pinned to SHA hashes with version comments
 
-## 12. Phase 2 / Phase 3 roadmap
+## 13. Phase 2 / Phase 3 roadmap
 
 Captured as guardrails so the Phase 1 design stays compatible — **not part of
 the Phase 1 build**.
@@ -455,7 +587,7 @@ the Phase 1 build**.
 - `civicrm_health` tool reporting server/version/auth status.
 - npm publish; optional `npx civicrm-mcp init` for first-time setup.
 
-## 13. Success criteria (Phase 1)
+## 14. Success criteria (Phase 1)
 
 The Phase 1 build is complete when:
 
@@ -470,12 +602,18 @@ The Phase 1 build is complete when:
 3. Custom fields are discoverable via `describe_entity` and queryable via
    `civicrm_get` / `civicrm_count`.
 4. All three test layers pass; integration tests pass against the real Civi.
-5. A second user can run the package with only a `CIVI_BASE_URL` and
+5. The `skills/civicrm` skill is installable via the documented one-line
+   copy, is discovered by Claude Code (`/skills` lists it), and noticeably
+   improves the agent's behaviour on the four example queries above (fewer
+   roundtrips, correct pseudo-constant usage from the first call).
+6. The skill-consistency test passes — every MCP tool name referenced in the
+   skill exists in the registered tool list.
+7. A second user can run the package with only a `CIVI_BASE_URL` and
    `CIVI_API_KEY` — no code changes.
-6. Zero warnings from `oxlint`, `oxfmt`, `tsc --noEmit`; all pre-commit hooks
+8. Zero warnings from `oxlint`, `oxfmt`, `tsc --noEmit`; all pre-commit hooks
    green.
 
-## 14. Known risks & open considerations
+## 15. Known risks & open considerations
 
 - **Tool description size.** `civicrm_describe_entity`'s output can be large
   for entities with many custom fields (Contact especially). If LLM context
@@ -492,7 +630,7 @@ The Phase 1 build is complete when:
   this in `queryHints` so the LLM knows to ask the user if a question is
   timezone-sensitive.
 
-## 15. Document status
+## 16. Document status
 
 This spec is the agreed Phase 1 contract. Changes after acceptance go through
 the same brainstorming flow and produce a new dated spec or an addendum.
