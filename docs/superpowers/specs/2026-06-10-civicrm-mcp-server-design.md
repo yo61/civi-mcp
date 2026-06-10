@@ -75,6 +75,43 @@ Three units, narrowly scoped, communicating through small interfaces:
 - **Bootstrap (`cli.ts`)** — reads env/args, builds the client, wires it into
   the MCP server, starts the stdio transport.
 
+### 3.1 DDD framing
+
+The three units above map cleanly onto **Domain-Driven Design** bounded
+contexts. Naming this explicitly matters because it constrains what each
+unit may know and which words it uses.
+
+| Context | Folder | Ubiquitous language | Role in the context map |
+|---|---|---|---|
+| Civi domain | `src/civi/` | `Entity`, `Field`, `Pseudoconstant`, `EntityDescribe` — mirrors APIv4 verbatim | Downstream of CiviCRM (Customer-Supplier); contains the **Anti-Corruption Layer** |
+| MCP | `src/mcp/` | `Tool`, `ToolResult`, `WhereClause`, `FieldClause`, `LogicalClause` | Downstream of Civi domain via `Civi4Client`; upstream of the agent |
+| Agent / skill | `skills/civicrm/` | User-domain shorthand: "member", "donor", "active", "lapsed" | The glossary that translates user language to MCP tool calls |
+
+**Anti-Corruption Layer.** `Civi4Client` is the ACL. APIv4's snake_case
+keys, `is_error` envelope, `data_type` strings, and `options`/`suffixes`
+arrays die at the boundary; the MCP layer sees only the typed value
+objects in `src/civi/types.ts`. Adding a future APIv4 quirk is a one-line
+change inside `mapField`/`mapDescribe`.
+
+**Value objects, not entities.** All types in `src/civi/types.ts`
+(`Field`, `Pseudoconstant`, `EntityDescribe`, `WhereClause`, `ApiKey`,
+…) are immutable value objects expressed as `readonly` TypeScript types.
+We deliberately do **not** model CiviCRM's runtime entities (Contact,
+Membership, Contribution). Civi owns them; we pass-through. Mirroring
+their model in our types would duplicate Civi's schema and break on
+unknown extensions — undermining the Phase 3 "any Civi admin" goal.
+
+**Generic Repository.** `Civi4Client` (`listEntities`, `describe`, `get`,
+`count`) is a generic repository parameterised by entity name. DDD purists
+typically prefer per-aggregate repositories, but the generic shape is
+correct here because we don't own the aggregates — APIv4 does. The
+introspection cache is the only piece of state we own; it is local to a
+client instance.
+
+**No domain events in Phase 1.** Phase 2's write tools may emit events
+(`MembershipCreated`, `ContactUpdated`) once we have something to do with
+them; until then YAGNI applies.
+
 ## 4. The four Phase 1 tools
 
 ### 4.1 `civicrm_list_entities`
