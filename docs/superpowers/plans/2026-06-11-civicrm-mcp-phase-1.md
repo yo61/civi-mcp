@@ -538,7 +538,7 @@ describe("loadConfig", () => {
     });
     expect(cfg.baseUrl.toString()).toBe("https://civi.example.org/");
     expect(cfg.apiKey).toBe("secret-key");
-    expect(cfg.authxPath).toBe("/civicrm/authx/api4");
+    expect(cfg.authxPath).toBe("/civicrm/ajax/api4");
     expect(cfg.timeoutMs).toBe(30_000);
     expect(cfg.logLevel).toBe("error");
   });
@@ -590,7 +590,7 @@ const EnvSchema = z.object({
   CIVI_API_KEY: z
     .string({ message: "CIVI_API_KEY is required" })
     .min(1, "CIVI_API_KEY must not be empty"),
-  CIVI_AUTHX_PATH: z.string().default("/civicrm/authx/api4"),
+  CIVI_AUTHX_PATH: z.string().default("/civicrm/ajax/api4"),
   CIVI_TIMEOUT_MS: z
     .string()
     .default("30000")
@@ -913,7 +913,7 @@ describe("postJson", () => {
   it("issues a POST with Bearer auth and JSON body, returns parsed JSON", async () => {
     const fetcher = vi.fn(async () => ok({ values: [{ id: 1 }], count: 1 }));
     const result = await postJson({
-      url: new URL("https://civi.example.org/civicrm/authx/api4/Contact/get"),
+      url: new URL("https://civi.example.org/civicrm/ajax/api4/Contact/get"),
       apiKey: "test-key",
       body: { params: { limit: 1 } },
       timeoutMs: 1000,
@@ -948,7 +948,7 @@ describe("postJson", () => {
       ok({ is_error: 1, error_message: "unknown field 'foo'", error_code: "unknown_field" }),
     );
     const promise = postJson({
-      url: new URL("https://civi.example.org/civicrm/authx/api4/Contact/get"),
+      url: new URL("https://civi.example.org/civicrm/ajax/api4/Contact/get"),
       apiKey: "k",
       body: {},
       timeoutMs: 1000,
@@ -1330,7 +1330,7 @@ export class Civi4Client {
   constructor(options: Civi4ClientOptions) {
     this.#baseUrl = options.baseUrl;
     this.#apiKey = options.apiKey;
-    this.#authxPath = options.authxPath ?? "/civicrm/authx/api4";
+    this.#authxPath = options.authxPath ?? "/civicrm/ajax/api4";
     this.#timeoutMs = options.timeoutMs ?? 30_000;
     this.#fetcher = options.fetcher ?? fetch;
   }
@@ -3309,22 +3309,35 @@ Restart Claude Desktop.
 
 ### Claude Code
 
-Add to your project's `.claude/settings.json` or your user-level config:
+Easiest: use the `claude mcp add` command, which writes to the right
+config file with the right schema. Run this in your project directory:
 
-```jsonc
-{
-  "mcpServers": {
-    "civicrm": {
-      "command": "npx",
-      "args": ["-y", "civicrm-mcp"],
-      "env": {
-        "CIVI_BASE_URL": "https://civi.example.org",
-        "CIVI_API_KEY": "<your-personal-api-key>"
-      }
-    }
-  }
-}
+```sh
+claude mcp add civicrm \
+  -e CIVI_BASE_URL=https://civi.example.org \
+  -e CIVI_API_KEY=<your-personal-api-key> \
+  -- npx -y civicrm-mcp
 ```
+
+`--scope local` is the default (per-project, written to `~/.claude.json`).
+Use `--scope user` to make it available in every Claude Code session, or
+`--scope project` to write a committable `.mcp.json` in the project root
+(use placeholders, never commit the real key).
+
+Verify with:
+
+```sh
+claude mcp list
+```
+
+`civicrm` should appear as `✓ Connected`. Start a new Claude Code session
+(in the same directory if you used `--scope local`) so the server is
+picked up, then run `/mcp` to confirm the four tools are listed.
+
+**Do NOT put the MCP server definition in `.claude/settings.json`** — that
+file is for permissions, hooks, env vars, status line, and model
+selection. MCP server definitions live in `.mcp.json` / `~/.claude.json`
+as written by `claude mcp add`.
 
 ## Verify
 
@@ -3340,7 +3353,7 @@ Try a small query: "How many contacts are in the database?"
 |---|---|---|---|
 | `CIVI_BASE_URL` | yes | — | Base URL of the Civi site |
 | `CIVI_API_KEY` | yes | — | User's personal API key (Bearer) |
-| `CIVI_AUTHX_PATH` | no | `/civicrm/authx/api4` | Override for non-standard sites |
+| `CIVI_AUTHX_PATH` | no | `/civicrm/ajax/api4` | Override for non-standard sites |
 | `CIVI_TIMEOUT_MS` | no | `30000` | HTTP request timeout |
 | `CIVI_LOG_LEVEL` | no | `error` | `error` \| `warn` \| `info` \| `debug` |
 ```

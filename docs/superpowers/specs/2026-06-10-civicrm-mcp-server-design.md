@@ -63,7 +63,7 @@ Three units, narrowly scoped, communicating through small interfaces:
    └──────────┬──────────────┘
               │ HTTPS + JSON
    ┌──────────▼──────────────┐
-   │   CiviCRM site          │   /civicrm/authx/api4/$Entity/$action
+   │   CiviCRM site          │   /civicrm/ajax/api4/$Entity/$action
    └─────────────────────────┘
 ```
 
@@ -346,7 +346,7 @@ class Civi4Client {
   constructor(opts: {
     baseUrl: URL;
     apiKey: ApiKey;        // branded string
-    authxPath?: string;    // default: "/civicrm/authx/api4"
+    authxPath?: string;    // default: "/civicrm/ajax/api4"
     timeoutMs?: number;    // default: 30_000
     fetcher?: typeof fetch; // injectable for tests
   });
@@ -392,7 +392,7 @@ All config from env vars, with CLI overrides for ad-hoc use:
 |---|---|---|---|
 | `CIVI_BASE_URL` | yes | — | Base URL of the Civi site |
 | `CIVI_API_KEY` | yes | — | User's personal API key (Bearer) |
-| `CIVI_AUTHX_PATH` | no | `/civicrm/authx/api4` | Override for non-standard sites |
+| `CIVI_AUTHX_PATH` | no | `/civicrm/ajax/api4` | Override for non-standard sites |
 | `CIVI_TIMEOUT_MS` | no | `30000` | HTTP request timeout |
 | `CIVI_CACHE_DIR` | no | (off) | Reserved for Phase 2 disk cache |
 | `CIVI_LOG_LEVEL` | no | `error` | `error` \| `warn` \| `info` \| `debug` |

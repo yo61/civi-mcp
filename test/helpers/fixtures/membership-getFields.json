@@ -1,0 +1,37 @@
+{
+  "values": [
+    {
+      "name": "id",
+      "data_type": "Integer",
+      "title": "Membership ID",
+      "required": true
+    },
+    {
+      "name": "status_id",
+      "data_type": "Integer",
+      "title": "Status",
+      "required": true,
+      "fk_entity": "MembershipStatus",
+      "options": [
+        { "id": 1, "name": "New", "label": "New" },
+        { "id": 2, "name": "Current", "label": "Current" }
+      ],
+      "suffixes": ["name", "label"]
+    },
+    {
+      "name": "start_date",
+      "data_type": "Date",
+      "title": "Membership Start Date",
+      "required": false
+    },
+    {
+      "name": "custom_42",
+      "data_type": "String",
+      "title": "Renewal source",
+      "required": false,
+      "custom_field_id": 42,
+      "custom_group": { "name": "MembershipDetails", "title": "Membership Details" },
+      "custom_field_name": "RenewalSource"
+    }
+  ]
+}
