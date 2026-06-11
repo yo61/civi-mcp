@@ -4,7 +4,10 @@
 
 - A CiviCRM 5.40+ site with the `authx` extension enabled.
 - A personal API key on your CiviCRM user (Contact → API key field).
-- Node 22+ and `npx` available locally.
+- **Node.js 22+** and `npx` available locally. Install via
+  [nodejs.org](https://nodejs.org/), Homebrew (`brew install node@22`),
+  or a version manager (`nvm install 22`, `fnm use 22`,
+  `asdf install nodejs 22`).
 
 ## Claude Code: install as a plugin (recommended)
 
