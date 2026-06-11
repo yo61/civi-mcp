@@ -12,7 +12,7 @@
  */
 import { PromiseCache } from "./cache.js";
 import { postJson } from "./http.js";
-import type { ApiKey, ApiV4Envelope, EntitySummary } from "./types.js";
+import type { ApiKey, ApiV4Envelope, EntityDescribe, EntitySummary, Field } from "./types.js";
 
 export type Civi4ClientOptions = {
   baseUrl: URL;
@@ -31,6 +31,7 @@ export class Civi4Client {
   readonly #timeoutMs: number;
   readonly #fetcher: typeof fetch;
   readonly #entityListCache = new PromiseCache<string, readonly EntitySummary[]>();
+  readonly #describeCache = new PromiseCache<string, EntityDescribe>();
 
   constructor(options: Civi4ClientOptions) {
     this.#baseUrl = options.baseUrl;
@@ -52,6 +53,21 @@ export class Civi4Client {
     });
   }
 
+  async describe(entity: string, opts: { refresh?: boolean } = {}): Promise<EntityDescribe> {
+    if (opts.refresh) this.#describeCache.invalidate(entity);
+    return this.#describeCache.getOrLoad(entity, async () => {
+      const [fieldsEnv, actionsEnv] = await Promise.all([
+        this.#call<ApiV4Envelope<RawField>>(entity, "getFields", {}),
+        this.#call<ApiV4Envelope<{ name: string }>>(entity, "getActions", {}),
+      ]);
+      return mapDescribe(
+        entity,
+        fieldsEnv.values,
+        actionsEnv.values.map((a) => a.name),
+      );
+    });
+  }
+
   async #call<T>(entity: string, action: string, params: Record<string, unknown>): Promise<T> {
     const url = new URL(`${this.#authxPath.replace(/\/$/, "")}/${entity}/${action}`, this.#baseUrl);
     return postJson<T>({
@@ -65,3 +81,63 @@ export class Civi4Client {
     });
   }
 }
+
+type RawField = {
+  name: string;
+  data_type: string;
+  title?: string;
+  description?: string;
+  required?: boolean;
+  fk_entity?: string;
+  options?: ReadonlyArray<{ id: string | number; name: string; label: string }>;
+  suffixes?: readonly string[];
+  custom_field_id?: number;
+  custom_group?: { name: string };
+  custom_field_name?: string;
+};
+
+const STANDARD_QUERY_HINTS = [
+  "Filter by pseudo-constant name: ['status_id:name','=','Current']",
+  "Date format: 'YYYY-MM-DD'",
+  "Join via dot-notation in select: ['contact_id.display_name']",
+  "Logical groups: ['AND', [[...],[...]]]; default top-level is AND",
+] as const;
+
+const mapField = (raw: RawField): Field => ({
+  name: raw.name,
+  type: raw.data_type,
+  required: raw.required === true,
+  ...(raw.title !== undefined ? { title: raw.title } : {}),
+  ...(raw.description !== undefined ? { description: raw.description } : {}),
+  ...(raw.fk_entity !== undefined ? { fkEntity: raw.fk_entity } : {}),
+  ...(raw.options && raw.options.length > 0
+    ? {
+        pseudoconstant: {
+          queryByName: `${raw.name}:name`,
+          queryByLabel: `${raw.name}:label`,
+          values: raw.options,
+        },
+      }
+    : {}),
+  ...(raw.custom_group && raw.custom_field_name
+    ? {
+        custom: {
+          groupName: raw.custom_group.name,
+          fieldName: raw.custom_field_name,
+        },
+      }
+    : {}),
+});
+
+const mapDescribe = (
+  entity: string,
+  fields: readonly RawField[],
+  actions: readonly string[],
+): EntityDescribe => ({
+  entity,
+  description: "",
+  actions,
+  primaryKey: ["id"],
+  fields: fields.map(mapField),
+  queryHints: STANDARD_QUERY_HINTS,
+});
