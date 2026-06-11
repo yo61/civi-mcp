@@ -6,7 +6,26 @@
 - A personal API key on your CiviCRM user (Contact → API key field).
 - Node 22+ and `npx` available locally.
 
-## Configure your MCP client
+## Claude Code: install as a plugin (recommended)
+
+The fastest path on Claude Code is the plugin in the
+[`yo61/claude-skills`](https://github.com/yo61/claude-skills) marketplace.
+It registers the MCP server **and** loads the companion skill in one
+step, prompting for the Civi URL and API key at install time:
+
+```
+/plugin marketplace add yo61/claude-skills
+/plugin install civi-mcp
+```
+
+The base URL goes to `~/.claude/settings.json`; the API key is stored in
+the system keychain (declared with `sensitive: true` in the plugin
+manifest). Skip the rest of this document if you went this route.
+
+## Configure your MCP client manually
+
+Use this path for Claude Desktop, Cursor, or any non-Claude-Code MCP
+client — or if you prefer to wire things up by hand.
 
 ### Claude Desktop
 

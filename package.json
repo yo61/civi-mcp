@@ -1,6 +1,6 @@
 {
   "name": "civi-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Model Context Protocol server for CiviCRM (APIv4).",
   "keywords": [
     "apiv4",

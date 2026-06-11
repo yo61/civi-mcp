@@ -1,0 +1,35 @@
+{
+  "name": "civi-mcp",
+  "version": "0.1.1",
+  "description": "CiviCRM MCP server (read-only APIv4) plus a companion skill for natural-language CRM queries. Installs and configures the npm-published civi-mcp server in one step.",
+  "author": {
+    "name": "Robin Bowes",
+    "email": "robin@yo61.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/yo61/civi-mcp",
+  "repository": "https://github.com/yo61/civi-mcp",
+  "userConfig": {
+    "civi_base_url": {
+      "type": "string",
+      "title": "CiviCRM Base URL",
+      "description": "Base URL of your CiviCRM site, e.g. https://civi.example.org"
+    },
+    "civi_api_key": {
+      "type": "string",
+      "title": "CiviCRM API Key",
+      "description": "Personal API key on your CiviCRM user (Contact -> API key field).",
+      "sensitive": true
+    }
+  },
+  "mcpServers": {
+    "civicrm": {
+      "command": "npx",
+      "args": ["-y", "civi-mcp"],
+      "env": {
+        "CIVI_BASE_URL": "${user_config.civi_base_url}",
+        "CIVI_API_KEY": "${user_config.civi_api_key}"
+      }
+    }
+  }
+}

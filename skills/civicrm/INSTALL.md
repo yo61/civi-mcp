@@ -4,13 +4,32 @@ This skill is the optional companion to the `civi-mcp` MCP server. The
 MCP server gives the agent typed tool contracts; this skill gives it
 workflow heuristics and domain knowledge.
 
-## Prerequisites
+## Recommended: install the plugin
+
+The skill and the MCP server are bundled in a single Claude Code plugin
+in the [`yo61/claude-skills`](https://github.com/yo61/claude-skills)
+marketplace. One command installs both:
+
+```
+/plugin marketplace add yo61/claude-skills
+/plugin install civi-mcp
+```
+
+Skip the rest of this document if you went this route.
+
+## Manual install
+
+Use this path if you cannot use the plugin marketplace (e.g. air-gapped
+environment) or if you've already wired up the MCP server by hand and
+only want the skill files.
+
+### Prerequisites
 
 - The `civi-mcp` MCP server is configured in your Claude Desktop /
   Claude Code MCP config (see `docs/install-mcp.md` in this repo).
 - Claude Code is installed and looks at `~/.claude/skills/` by default.
 
-## Install
+### Install
 
 From a clone of this repo:
 

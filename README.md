@@ -17,11 +17,26 @@ Phase 1 — read-only, four generic tools, single-tenant via personal API key.
 
 ## Quick start
 
-1. Make sure the `authx` extension is enabled on your CiviCRM site and
-   you have a personal API key.
-2. Configure the MCP server: see [`docs/install-mcp.md`](docs/install-mcp.md).
-3. (Optional, Claude Code users) install the skill: see
-   [`docs/install-skill.md`](docs/install-skill.md).
+Make sure the `authx` extension is enabled on your CiviCRM site and you
+have a personal API key (Contact -> API key field).
+
+### Claude Code (recommended)
+
+This repo is also published as a Claude Code plugin via the
+[`yo61/claude-skills`](https://github.com/yo61/claude-skills) marketplace.
+One command registers the MCP server and the skill, prompting for the
+Civi URL and API key (the key is stored in the system keychain):
+
+```
+/plugin marketplace add yo61/claude-skills
+/plugin install civi-mcp
+```
+
+### Other MCP clients (or manual Claude Code setup)
+
+- Configure the MCP server by hand: see [`docs/install-mcp.md`](docs/install-mcp.md).
+- (Claude Code only) install the skill by hand: see
+  [`docs/install-skill.md`](docs/install-skill.md).
 
 ## How it works
 
