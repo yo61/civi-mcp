@@ -1,0 +1,15 @@
+{
+  // Rule config lives in .markdownlint.jsonc (so editors that don't speak
+  // cli2 config still pick it up). This file only carries cli2-specific
+  // settings — currently just the ignore list.
+  "ignores": [
+    "node_modules",
+    "dist",
+    "coverage",
+    // Specs, plans, and knowledge notes have their own formatting
+    // conventions (mirrored from upstream skills) and are not edited as
+    // part of this codebase's lint scope.
+    "docs/superpowers",
+    "knowledge",
+  ],
+}
