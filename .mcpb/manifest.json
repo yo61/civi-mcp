@@ -1,0 +1,43 @@
+{
+  "manifest_version": "0.2",
+  "name": "civi-mcp",
+  "version": "0.0.0-placeholder",
+  "description": "Read-only access to CiviCRM via APIv4. MCP server with four generic query tools (list_entities, describe_entity, get, count) for natural-language CRM queries from Claude Desktop.",
+  "author": {
+    "name": "Robin Bowes",
+    "email": "robin@yo61.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/yo61/civi-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yo61/civi-mcp"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "dist/cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/cli.js"],
+      "env": {
+        "CIVI_BASE_URL": "${user_config.civi_base_url}",
+        "CIVI_API_KEY": "${user_config.civi_api_key}"
+      }
+    }
+  },
+  "user_config": {
+    "civi_base_url": {
+      "type": "string",
+      "title": "CiviCRM Base URL",
+      "description": "Base URL of your CiviCRM site, e.g. https://civi.example.org",
+      "required": true
+    },
+    "civi_api_key": {
+      "type": "string",
+      "title": "CiviCRM API Key",
+      "description": "Personal API key on your CiviCRM user (Contact -> API key field).",
+      "required": true,
+      "sensitive": true
+    }
+  }
+}

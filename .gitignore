@@ -5,6 +5,9 @@ build/
 .tsbuildinfo
 *.tsbuildinfo
 
+# MCPB build artifacts (manifest.json is committed; bundle is a release artifact)
+.mcpb/*.mcpb
+
 # Test / coverage
 coverage/
 .vitest-cache/

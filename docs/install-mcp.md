@@ -25,10 +25,26 @@ The base URL goes to `~/.claude/settings.json`; the API key is stored in
 the system keychain (declared with `sensitive: true` in the plugin
 manifest). Skip the rest of this document if you went this route.
 
+## Claude Desktop: install the `.mcpb` bundle (recommended)
+
+Each [GitHub release](https://github.com/yo61/civi-mcp/releases) ships a
+`civi-mcp-vX.Y.Z.mcpb` asset — an
+[MCP Bundle](https://github.com/modelcontextprotocol/mcpb) that
+Claude Desktop installs in one click.
+
+1. Download `civi-mcp-vX.Y.Z.mcpb` from the latest release.
+2. In Claude Desktop: **Settings → Extensions → Install Extension…**
+   (or drag the `.mcpb` file into the window).
+3. Enter your CiviCRM Base URL and API key when prompted. The API key is
+   marked `sensitive` in the manifest and is stored in the system
+   keychain — it never lands in `claude_desktop_config.json`.
+
+Skip the manual JSON section below if you went this route.
+
 ## Configure your MCP client manually
 
-Use this path for Claude Desktop, Cursor, or any non-Claude-Code MCP
-client — or if you prefer to wire things up by hand.
+Use this path for Cursor, Continue, or any other MCP client — or if you
+prefer to wire Claude Desktop / Claude Code up by hand.
 
 ### Claude Desktop
 

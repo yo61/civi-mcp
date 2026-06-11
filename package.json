@@ -1,6 +1,6 @@
 {
   "name": "civi-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Model Context Protocol server for CiviCRM (APIv4).",
   "keywords": [
     "apiv4",
@@ -39,6 +39,7 @@
     "test:watch": "vitest",
     "test:integration": "CIVI_INTEGRATION=1 vitest run test/integration",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "mcpb": "pnpm build && node scripts/build-mcpb.mjs",
     "prepublishOnly": "pnpm verify && pnpm build"
   },
   "dependencies": {
@@ -47,6 +48,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@anthropic-ai/mcpb": "^2.1.2",
     "@types/node": "^25.9.3",
     "oxfmt": "^0.54.0",
     "oxlint": "^1.69.0",
