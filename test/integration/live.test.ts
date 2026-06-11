@@ -30,11 +30,18 @@ d("Civi4Client against a real Civi (env-gated)", () => {
     expect(contactType?.pseudoconstant).toBeDefined();
   });
 
-  it("counts active individuals (smoke test, exact number not asserted)", async () => {
-    const result = await client.count("Contact", [
-      ["contact_type", "=", "Individual"],
-      ["is_deleted", "=", 0],
-    ]);
-    expect(result.count).toBeGreaterThanOrEqual(0);
+  // Discriminating filter assertion — the previous version of this test
+  // ("count >= 0") passed even when filters were silently dropped, which
+  // let the form-encoded-body bug ship. A filter that genuinely
+  // discriminates must produce a STRICTLY smaller count than no filter.
+  it("counts active individuals — filter actually filters", async () => {
+    const all = await client.count("Contact");
+    const individuals = await client.count("Contact", [["contact_type", "=", "Individual"]]);
+    const orgs = await client.count("Contact", [["contact_type", "=", "Organization"]]);
+
+    expect(all.count).toBeGreaterThan(0);
+    expect(individuals.count).toBeGreaterThan(0);
+    expect(individuals.count).toBeLessThan(all.count);
+    expect(individuals.count + orgs.count).toBeLessThanOrEqual(all.count);
   });
 });

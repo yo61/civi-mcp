@@ -3,7 +3,13 @@ import { CiviApiError, CiviAuthError, CiviTransportError } from "./errors.js";
 export type PostJsonInput = {
   url: URL;
   apiKey: string;
-  body: unknown;
+  /**
+   * The APIv4 params object. Will be sent as form-encoded
+   * `params=<URL-encoded JSON>` because the CiviCRM AJAX endpoint reads
+   * `$_POST['params']` — a raw JSON request body is silently ignored,
+   * causing every filter/select/limit/groupBy to be dropped on the floor.
+   */
+  params: Record<string, unknown>;
   timeoutMs: number;
   fetcher?: typeof fetch;
   entity?: string;
@@ -19,11 +25,13 @@ const isErrorPayload = (
   (value as { is_error: unknown }).is_error === 1;
 
 export const postJson = async <T>(input: PostJsonInput): Promise<T> => {
-  const { url, apiKey, body, timeoutMs, entity, action } = input;
+  const { url, apiKey, params, timeoutMs, entity, action } = input;
   const fetcher = input.fetcher ?? fetch;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  const body = `params=${encodeURIComponent(JSON.stringify(params))}`;
 
   let response: Response;
   try {
@@ -31,10 +39,10 @@ export const postJson = async <T>(input: PostJsonInput): Promise<T> => {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: JSON.stringify(body),
+      body,
       signal: controller.signal,
     });
   } catch (cause) {

@@ -11,12 +11,12 @@ const ok = (body: unknown) =>
 type FetchFn = typeof fetch;
 
 describe("postJson", () => {
-  it("issues a POST with Bearer auth and JSON body, returns parsed JSON", async () => {
+  it("issues a POST with Bearer auth and form-encoded params, returns parsed JSON", async () => {
     const fetcher = vi.fn<FetchFn>(async () => ok({ values: [{ id: 1 }], count: 1 }));
     const result = await postJson({
       url: new URL("https://civi.example.org/civicrm/ajax/api4/Contact/get"),
       apiKey: "test-key",
-      body: { params: { limit: 1 } },
+      params: { limit: 1 },
       timeoutMs: 1000,
       fetcher,
     });
@@ -28,9 +28,38 @@ describe("postJson", () => {
     expect(init?.method).toBe("POST");
     const headers = init?.headers as Record<string, string>;
     expect(headers["Authorization"]).toBe("Bearer test-key");
-    expect(headers["Content-Type"]).toBe("application/json");
+    expect(headers["Content-Type"]).toBe("application/x-www-form-urlencoded");
     expect(headers["X-Requested-With"]).toBe("XMLHttpRequest");
-    expect(JSON.parse(init?.body as string)).toEqual({ params: { limit: 1 } });
+    const body = init?.body as string;
+    expect(body.startsWith("params=")).toBe(true);
+    const sentParams = JSON.parse(decodeURIComponent(body.slice("params=".length))) as unknown;
+    expect(sentParams).toEqual({ limit: 1 });
+  });
+
+  // Regression guard for the bug discovered during Task 22 hands-on testing:
+  // CiviCRM's AJAX endpoint reads $_POST['params']. A raw JSON request body
+  // (the previous implementation) means PHP sees no params and APIv4 returns
+  // every row, ignoring where/select/limit/groupBy. The exact wire shape
+  // tested here is the only thing keeping that regression from coming back.
+  it("encodes complex params (where, select, limit, groupBy) intact via the form body", async () => {
+    const fetcher = vi.fn<FetchFn>(async () => ok({ values: [], count: 0 }));
+    const complex = {
+      where: [["contribution_status_id:name", "=", "Pending"]],
+      select: ["row_count"],
+      limit: 25,
+      groupBy: ["contact_id"],
+    };
+    await postJson({
+      url: new URL("https://civi.example.org/civicrm/ajax/api4/Contribution/get"),
+      apiKey: "k",
+      params: complex,
+      timeoutMs: 1000,
+      fetcher,
+    });
+    const body = fetcher.mock.calls[0]?.[1]?.body as string;
+    expect(body.startsWith("params=")).toBe(true);
+    const sent = JSON.parse(decodeURIComponent(body.slice("params=".length))) as typeof complex;
+    expect(sent).toEqual(complex);
   });
 
   it("throws CiviAuthError on 401", async () => {
@@ -39,7 +68,7 @@ describe("postJson", () => {
       postJson({
         url: new URL("https://civi.example.org/p"),
         apiKey: "k",
-        body: {},
+        params: {},
         timeoutMs: 1000,
         fetcher,
       }),
@@ -57,7 +86,7 @@ describe("postJson", () => {
     const promise = postJson({
       url: new URL("https://civi.example.org/civicrm/ajax/api4/Contact/get"),
       apiKey: "k",
-      body: {},
+      params: {},
       timeoutMs: 1000,
       fetcher,
       entity: "Contact",
@@ -78,7 +107,7 @@ describe("postJson", () => {
       postJson({
         url: new URL("https://civi.example.org/p"),
         apiKey: "k",
-        body: {},
+        params: {},
         timeoutMs: 1000,
         fetcher,
       }),
@@ -98,7 +127,7 @@ describe("postJson", () => {
       postJson({
         url: new URL("https://civi.example.org/p"),
         apiKey: "k",
-        body: {},
+        params: {},
         timeoutMs: 5,
         fetcher,
       }),

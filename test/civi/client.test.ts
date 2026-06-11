@@ -7,6 +7,14 @@ import { mockFetch } from "../helpers/mock-fetch.js";
 
 const baseUrl = new URL("https://civi.example.org");
 
+// Decode the form-encoded `params=<URL-encoded JSON>` wire body the client
+// sends to CiviCRM's AJAX endpoint. See test/civi/http.test.ts for the
+// rationale on why it isn't a raw JSON body.
+const decodeParams = (body: unknown): Record<string, unknown> => {
+  const text = body as string;
+  return JSON.parse(decodeURIComponent(text.slice("params=".length))) as Record<string, unknown>;
+};
+
 describe("Civi4Client.listEntities", () => {
   it("returns mapped entity summaries", async () => {
     const fetcher = mockFetch({
@@ -111,8 +119,8 @@ describe("Civi4Client.get", () => {
     expect(result.count).toBe(1);
     expect(result.values[0]?.display_name).toBe("Alice");
     const [, init] = fetcher.mock.calls[0]!;
-    const body = JSON.parse(init?.body as string) as { params: Record<string, unknown> };
-    expect(body.params).toMatchObject({
+    const params = decodeParams(init?.body);
+    expect(params).toMatchObject({
       where: [["display_name", "LIKE", "Ali%"]],
       select: ["id", "display_name"],
       limit: 25,
@@ -123,11 +131,9 @@ describe("Civi4Client.get", () => {
     const fetcher = mockFetch({ "Contact/get": { values: [], count: 0 } });
     const client = new Civi4Client({ baseUrl, apiKey: asApiKey("k"), fetcher });
     await client.get("Contact", {});
-    const body = JSON.parse(fetcher.mock.calls[0]![1]?.body as string) as {
-      params: Record<string, unknown>;
-    };
-    expect(Object.keys(body.params)).not.toContain("orderBy");
-    expect(Object.keys(body.params)).not.toContain("groupBy");
+    const params = decodeParams(fetcher.mock.calls[0]![1]?.body);
+    expect(Object.keys(params)).not.toContain("orderBy");
+    expect(Object.keys(params)).not.toContain("groupBy");
   });
 });
 
@@ -137,9 +143,7 @@ describe("Civi4Client.count", () => {
     const client = new Civi4Client({ baseUrl, apiKey: asApiKey("k"), fetcher });
     const result = await client.count("Contact", [["contact_type", "=", "Individual"]]);
     expect(result.count).toBe(142);
-    const body = JSON.parse(fetcher.mock.calls[0]![1]?.body as string) as {
-      params: { select: string[] };
-    };
-    expect(body.params.select).toEqual(["row_count"]);
+    const params = decodeParams(fetcher.mock.calls[0]![1]?.body) as { select: string[] };
+    expect(params.select).toEqual(["row_count"]);
   });
 });

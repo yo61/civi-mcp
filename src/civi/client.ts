@@ -105,7 +105,7 @@ export class Civi4Client {
     return postJson<T>({
       url,
       apiKey: this.#apiKey,
-      body: { params },
+      params,
       timeoutMs: this.#timeoutMs,
       fetcher: this.#fetcher,
       entity,

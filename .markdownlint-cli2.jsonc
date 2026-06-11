@@ -6,9 +6,11 @@
     "node_modules",
     "dist",
     "coverage",
-    // /knowledge/ is a workflow notebook (not part of the codebase's
-    // ship surface) — keep it out of repo-lint scope.
+    // /knowledge/ and /notes/ are workflow scratch spaces (handoffs,
+    // debugging notes, hypotheses) — not part of the codebase's ship
+    // surface, so keep them out of repo-lint scope.
     "knowledge",
+    "notes",
     // TODO(phase-1-cleanup): spec and plan files have ~40 structural
     // violations (mostly MD031/MD032 blanks-around-fences/lists, one
     // MD024 duplicate heading, one MD029 ol-prefix). Fix those in a
