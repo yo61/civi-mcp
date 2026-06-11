@@ -12,7 +12,14 @@
  */
 import { PromiseCache } from "./cache.js";
 import { postJson } from "./http.js";
-import type { ApiKey, ApiV4Envelope, EntityDescribe, EntitySummary, Field } from "./types.js";
+import type {
+  ApiKey,
+  ApiV4Envelope,
+  EntityDescribe,
+  EntitySummary,
+  Field,
+  GetParams,
+} from "./types.js";
 
 export type Civi4ClientOptions = {
   baseUrl: URL;
@@ -68,6 +75,22 @@ export class Civi4Client {
     });
   }
 
+  async get<T = unknown>(
+    entity: string,
+    params: GetParams,
+  ): Promise<{ count: number; values: readonly T[] }> {
+    const body = stripUndefined({
+      where: params.where,
+      select: params.select,
+      orderBy: params.orderBy,
+      limit: params.limit,
+      offset: params.offset,
+      groupBy: params.groupBy,
+    });
+    const env = await this.#call<ApiV4Envelope<T>>(entity, "get", body);
+    return { count: env.count ?? env.values.length, values: env.values };
+  }
+
   async #call<T>(entity: string, action: string, params: Record<string, unknown>): Promise<T> {
     const url = new URL(`${this.#authxPath.replace(/\/$/, "")}/${entity}/${action}`, this.#baseUrl);
     return postJson<T>({
@@ -94,6 +117,14 @@ type RawField = {
   custom_field_id?: number;
   custom_group?: { name: string };
   custom_field_name?: string;
+};
+
+const stripUndefined = <T extends Record<string, unknown>>(obj: T): Partial<T> => {
+  const out: Partial<T> = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined) (out as Record<string, unknown>)[k] = v;
+  }
+  return out;
 };
 
 const STANDARD_QUERY_HINTS = [

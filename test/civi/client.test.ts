@@ -93,3 +93,40 @@ describe("Civi4Client.describe", () => {
     expect(fetcher).toHaveBeenCalledTimes(4);
   });
 });
+
+describe("Civi4Client.get", () => {
+  it("passes where/select/limit through to APIv4 and returns mapped envelope", async () => {
+    const fetcher = mockFetch({
+      "Contact/get": {
+        values: [{ id: 1, display_name: "Alice" }],
+        count: 1,
+      },
+    });
+    const client = new Civi4Client({ baseUrl, apiKey: asApiKey("k"), fetcher });
+    const result = await client.get<{ id: number; display_name: string }>("Contact", {
+      where: [["display_name", "LIKE", "Ali%"]],
+      select: ["id", "display_name"],
+      limit: 25,
+    });
+    expect(result.count).toBe(1);
+    expect(result.values[0]?.display_name).toBe("Alice");
+    const [, init] = fetcher.mock.calls[0]!;
+    const body = JSON.parse(init?.body as string) as { params: Record<string, unknown> };
+    expect(body.params).toMatchObject({
+      where: [["display_name", "LIKE", "Ali%"]],
+      select: ["id", "display_name"],
+      limit: 25,
+    });
+  });
+
+  it("does not include undefined params in the request body", async () => {
+    const fetcher = mockFetch({ "Contact/get": { values: [], count: 0 } });
+    const client = new Civi4Client({ baseUrl, apiKey: asApiKey("k"), fetcher });
+    await client.get("Contact", {});
+    const body = JSON.parse(fetcher.mock.calls[0]![1]?.body as string) as {
+      params: Record<string, unknown>;
+    };
+    expect(Object.keys(body.params)).not.toContain("orderBy");
+    expect(Object.keys(body.params)).not.toContain("groupBy");
+  });
+});
