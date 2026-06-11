@@ -2,6 +2,21 @@
   "name": "civi-mcp",
   "version": "0.1.0",
   "description": "Model Context Protocol server for CiviCRM (APIv4).",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "civicrm",
+    "apiv4",
+    "claude"
+  ],
+  "homepage": "https://github.com/yo61/civi-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/yo61/civi-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yo61/civi-mcp.git"
+  },
   "license": "MIT",
   "bin": {
     "civi-mcp": "./dist/cli.js"
@@ -23,7 +38,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "CIVI_INTEGRATION=1 vitest run test/integration",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test",
+    "prepublishOnly": "pnpm verify && pnpm build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
