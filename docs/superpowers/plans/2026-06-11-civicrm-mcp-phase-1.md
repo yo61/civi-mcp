@@ -3309,22 +3309,35 @@ Restart Claude Desktop.
 
 ### Claude Code
 
-Add to your project's `.claude/settings.json` or your user-level config:
+Easiest: use the `claude mcp add` command, which writes to the right
+config file with the right schema. Run this in your project directory:
 
-```jsonc
-{
-  "mcpServers": {
-    "civicrm": {
-      "command": "npx",
-      "args": ["-y", "civicrm-mcp"],
-      "env": {
-        "CIVI_BASE_URL": "https://civi.example.org",
-        "CIVI_API_KEY": "<your-personal-api-key>"
-      }
-    }
-  }
-}
+```sh
+claude mcp add civicrm \
+  -e CIVI_BASE_URL=https://civi.example.org \
+  -e CIVI_API_KEY=<your-personal-api-key> \
+  -- npx -y civicrm-mcp
 ```
+
+`--scope local` is the default (per-project, written to `~/.claude.json`).
+Use `--scope user` to make it available in every Claude Code session, or
+`--scope project` to write a committable `.mcp.json` in the project root
+(use placeholders, never commit the real key).
+
+Verify with:
+
+```sh
+claude mcp list
+```
+
+`civicrm` should appear as `✓ Connected`. Start a new Claude Code session
+(in the same directory if you used `--scope local`) so the server is
+picked up, then run `/mcp` to confirm the four tools are listed.
+
+**Do NOT put the MCP server definition in `.claude/settings.json`** — that
+file is for permissions, hooks, env vars, status line, and model
+selection. MCP server definitions live in `.mcp.json` / `~/.claude.json`
+as written by `claude mcp add`.
 
 ## Verify
 
