@@ -9,19 +9,19 @@
 
 2. **Query:**
 
-   ```
-   civicrm_get(
-     entity: "Membership",
-     where: [
-       ["status_id:name","IN",["Expired","Cancelled"]],
-       ["end_date",">=","<30-days-ago>"],
-       ["end_date","<=","<today>"]
-     ],
-     select: ["contact_id.display_name", "membership_type_id:name", "end_date"],
-     orderBy: { "end_date": "DESC" },
-     limit: 100
-   )
-   ```
+    ```
+    civicrm_get(
+      entity: "Membership",
+      where: [
+        ["status_id:name","IN",["Expired","Cancelled"]],
+        ["end_date",">=","<30-days-ago>"],
+        ["end_date","<=","<today>"]
+      ],
+      select: ["contact_id.display_name", "membership_type_id:name", "end_date"],
+      orderBy: { "end_date": "DESC" },
+      limit: 100
+    )
+    ```
 
 ## Notes
 
