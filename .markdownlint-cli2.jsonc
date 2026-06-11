@@ -9,10 +9,11 @@
     // /knowledge/ is a workflow notebook (not part of the codebase's
     // ship surface) — keep it out of repo-lint scope.
     "knowledge",
-    // TODO(phase-1-cleanup): spec and plan files have ~10 structural
-    // violations (duplicate headings, blanks-around-table/fence). Fix
-    // those in a follow-up commit, then remove this exclusion. Robin's
-    // explicit intent is for docs to be linted.
+    // TODO(phase-1-cleanup): spec and plan files have ~40 structural
+    // violations (mostly MD031/MD032 blanks-around-fences/lists, one
+    // MD024 duplicate heading, one MD029 ol-prefix). Fix those in a
+    // follow-up commit, then remove this exclusion. Robin's explicit
+    // intent is for docs to be linted.
     "docs/superpowers",
   ],
 }
