@@ -27,12 +27,12 @@ Phase 1 — read-only, four generic tools, single-tenant via personal API key.
 
 The MCP server exposes four typed tools:
 
-| Tool | Purpose |
-|---|---|
-| `civicrm_list_entities` | Discover entities on this site |
+| Tool                      | Purpose                                              |
+| ------------------------- | ---------------------------------------------------- |
+| `civicrm_list_entities`   | Discover entities on this site                       |
 | `civicrm_describe_entity` | Fields, pseudo-constants, query hints for one entity |
-| `civicrm_get` | Generic query (where / select / orderBy / limit) |
-| `civicrm_count` | Cheap exact-count for "how many" questions |
+| `civicrm_get`             | Generic query (where / select / orderBy / limit)     |
+| `civicrm_count`           | Cheap exact-count for "how many" questions           |
 
 The agent calls `describe_entity` once per entity, then issues structured
 queries. Pseudo-constants are surfaced so the agent can write
