@@ -33,8 +33,10 @@ Each [GitHub release](https://github.com/yo61/civi-mcp/releases) ships a
 Claude Desktop installs in one click.
 
 1. Download `civi-mcp-vX.Y.Z.mcpb` from the latest release.
-2. In Claude Desktop: **Settings → Extensions → Install Extension…**
-   (or drag the `.mcpb` file into the window).
+2. **Double-click the downloaded file** — Claude Desktop opens an install
+   dialog. (Alternatively: in Claude Desktop go to
+   **Settings → Extensions → Install Extension…**, or drag the `.mcpb`
+   into the window.)
 3. Enter your CiviCRM Base URL and API key when prompted. The API key is
    marked `sensitive` in the manifest and is stored in the system
    keychain — it never lands in `claude_desktop_config.json`.

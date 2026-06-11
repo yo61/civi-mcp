@@ -35,9 +35,10 @@ Civi URL and API key (the key is stored in the system keychain):
 ### Claude Desktop (recommended)
 
 Each [release](https://github.com/yo61/civi-mcp/releases) ships a
-`civi-mcp-vX.Y.Z.mcpb` MCP Bundle. Download it, then in Claude Desktop:
-**Settings → Extensions → Install Extension…** (or drag the file into
-the window). Enter the Civi URL and API key when prompted; the key is
+`civi-mcp-vX.Y.Z.mcpb` MCP Bundle. Download it and **double-click the
+file** — Claude Desktop opens an install dialog. (Alternatively:
+**Settings → Extensions → Install Extension…**, or drag the file into
+the window.) Enter the Civi URL and API key when prompted; the key is
 stored in the system keychain.
 
 ### Other MCP clients (or manual setup)
