@@ -10,7 +10,7 @@ const main = async (): Promise<void> => {
   const cfg = loadConfig(process.env);
   const log = createLogger(cfg.logLevel);
 
-  log.info({ baseUrl: cfg.baseUrl.toString() }, "starting civicrm-mcp");
+  log.info({ baseUrl: cfg.baseUrl.toString() }, "starting civi-mcp");
 
   const client = new Civi4Client({
     baseUrl: cfg.baseUrl,

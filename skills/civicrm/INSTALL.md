@@ -1,12 +1,12 @@
 # Installing the CiviCRM skill
 
-This skill is the optional companion to the `civicrm-mcp` MCP server. The
+This skill is the optional companion to the `civi-mcp` MCP server. The
 MCP server gives the agent typed tool contracts; this skill gives it
 workflow heuristics and domain knowledge.
 
 ## Prerequisites
 
-- The `civicrm-mcp` MCP server is configured in your Claude Desktop /
+- The `civi-mcp` MCP server is configured in your Claude Desktop /
   Claude Code MCP config (see `docs/install-mcp.md` in this repo).
 - Claude Code is installed and looks at `~/.claude/skills/` by default.
 

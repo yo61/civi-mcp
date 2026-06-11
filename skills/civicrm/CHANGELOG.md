@@ -7,4 +7,4 @@ server, the skill, or both.
 
 - Initial Phase 1 skill: workflow heuristics, mental model,
   pseudo-constant cheat-sheet, four worked examples.
-- **MCP version required:** civicrm-mcp 0.1.0 (the four Phase 1 tools).
+- **MCP version required:** civi-mcp 0.1.0 (the four Phase 1 tools).

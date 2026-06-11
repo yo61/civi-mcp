@@ -1,4 +1,4 @@
-# `civicrm-mcp` — Design Spec
+# `civi-mcp` — Design Spec
 
 - **Date:** 2026-06-10
 - **Status:** Approved (Phase 1 scope)
@@ -261,7 +261,7 @@ name: civicrm
 description: Use when answering analytical or operational questions about a
   CiviCRM instance — members, contributions, events, contacts, activities.
   Provides workflow heuristics and common query patterns. Requires the
-  civicrm-mcp MCP server to be configured.
+  civi-mcp MCP server to be configured.
 ---
 ```
 
@@ -404,7 +404,7 @@ Example Claude Desktop config snippet:
   "mcpServers": {
     "civicrm": {
       "command": "npx",
-      "args": ["-y", "civicrm-mcp"],
+      "args": ["-y", "civi-mcp"],
       "env": {
         "CIVI_BASE_URL": "https://civi.example.org",
         "CIVI_API_KEY": "<personal-api-key>"
@@ -613,7 +613,7 @@ the Phase 1 build**.
 - `pnpm generate-tools` CLI: uses `Civi4Client.getFields` to emit typed
   dedicated tools under `src/mcp/tools/dedicated/<Entity>.ts`. Opt-in via
   `CIVI_MCP_DEDICATED_TOOLS=Membership,Contribution`.
-- Optional on-disk describe cache under `$XDG_CACHE_HOME/civicrm-mcp/<site-hash>/`.
+- Optional on-disk describe cache under `$XDG_CACHE_HOME/civi-mcp/<site-hash>/`.
 
 ### Phase 3 — public release
 
@@ -622,7 +622,7 @@ the Phase 1 build**.
   holds no credentials.
 - APIv3 fallback module for entities not yet on v4.
 - `civicrm_health` tool reporting server/version/auth status.
-- npm publish; optional `npx civicrm-mcp init` for first-time setup.
+- npm publish; optional `npx civi-mcp init` for first-time setup.
 
 ## 14. Success criteria (Phase 1)
 

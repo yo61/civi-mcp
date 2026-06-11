@@ -3,7 +3,7 @@
 ## H1: The CiviCRM MCP design generalises to a framework
 
 **Hypothesis:** The dispatcher + introspection + generic CRUD pattern used
-in `civicrm-mcp` (`listEntities`/`describe`/`get`/`count`) is reusable as
+in `civi-mcp` (`listEntities`/`describe`/`get`/`count`) is reusable as
 a framework. `Civi4Client` is structurally an "adapter" — extract its
 shape into an interface and the same MCP wiring + caching + error
 mapping should work for any backend with introspection.
@@ -34,5 +34,5 @@ another similar MCP server and finds themselves copy-pasting
 `PromiseCache`, `wrapHandler`, and the dispatcher tools, that's the
 signal to extract.
 
-**Raised by:** Robin, 2026-06-11, during civicrm-mcp Phase 1 execution
+**Raised by:** Robin, 2026-06-11, during civi-mcp Phase 1 execution
 (Task 1 done).

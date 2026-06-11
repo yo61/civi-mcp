@@ -63,7 +63,7 @@ _around_ startup before dispatch ever runs.
 
 ## Where to look first
 
-Recent commits on `feat/civicrm-mcp-phase-1`:
+Recent commits on `feat/civi-mcp-phase-1`:
 
 ```
 d0645e6 feat(skill): SKILL.md with workflow heuristics and mental model
@@ -127,7 +127,7 @@ A minimal `/tmp/mcp-handshake.jsonl`:
 ## Environment
 
 - Project: `/Users/robin/code/github.com/yo61/civi-mcp-server`
-- Branch: `feat/civicrm-mcp-phase-1`
+- Branch: `feat/civi-mcp-phase-1`
 - MCP transport: stdio
 - Configured via: `.mcp.json` or `claude mcp add` (per project memory —
   `.claude/settings.json` is NOT the config location for this client).

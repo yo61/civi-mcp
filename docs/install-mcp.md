@@ -1,4 +1,4 @@
-# Installing the civicrm-mcp server
+# Installing the civi-mcp server
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`
   "mcpServers": {
     "civicrm": {
       "command": "npx",
-      "args": ["-y", "civicrm-mcp"],
+      "args": ["-y", "civi-mcp"],
       "env": {
         "CIVI_BASE_URL": "https://civi.example.org",
         "CIVI_API_KEY": "<your-personal-api-key>"
@@ -39,7 +39,7 @@ config file with the right schema. Run this in your project directory:
 claude mcp add civicrm \
   -e CIVI_BASE_URL=https://civi.example.org \
   -e CIVI_API_KEY=<your-personal-api-key> \
-  -- npx -y civicrm-mcp
+  -- npx -y civi-mcp
 ```
 
 `--scope local` is the default (per-project, written to `~/.claude.json`).

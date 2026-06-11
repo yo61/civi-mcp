@@ -1,10 +1,10 @@
 {
-  "name": "civicrm-mcp",
+  "name": "civi-mcp",
   "version": "0.1.0",
   "description": "Model Context Protocol server for CiviCRM (APIv4).",
   "license": "MIT",
   "bin": {
-    "civicrm-mcp": "./dist/cli.js"
+    "civi-mcp": "./dist/cli.js"
   },
   "files": [
     "dist",

@@ -30,7 +30,7 @@ type AnyTool = {
 
 export const buildServer = (client: Civi4Client, log: Logger): CiviMcpServer => {
   const server = new McpServer({
-    name: "civicrm-mcp",
+    name: "civi-mcp",
     version: "0.1.0",
   }) as CiviMcpServer;
   const registered: string[] = [];

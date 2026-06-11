@@ -1,4 +1,4 @@
-# civicrm-mcp
+# civi-mcp
 
 A Model Context Protocol server for CiviCRM. Answer natural-language
 questions about your CRM ("how many life members signed up since
@@ -10,7 +10,7 @@ Phase 1 — read-only, four generic tools, single-tenant via personal API key.
 
 ## What's in this repo
 
-- `src/` — the TypeScript MCP server (published to npm as `civicrm-mcp`)
+- `src/` — the TypeScript MCP server (published to npm as `civi-mcp`)
 - `skills/civicrm/` — an optional Claude Code skill with workflow
   heuristics and worked examples
 - `docs/` — install guides and the design spec
@@ -39,7 +39,7 @@ queries. Pseudo-constants are surfaced so the agent can write
 `['status_id:name','=','Current']` rather than guessing numeric ids.
 Custom fields are discovered through introspection.
 
-See [the design spec](docs/superpowers/specs/2026-06-10-civicrm-mcp-server-design.md)
+See [the design spec](docs/superpowers/specs/2026-06-10-civi-mcp-server-design.md)
 for details.
 
 ## Development

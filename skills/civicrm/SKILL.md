@@ -1,11 +1,11 @@
 ---
 name: civicrm
-description: Use when answering analytical or operational questions about a CiviCRM instance — members, contributions, events, contacts, activities. Provides workflow heuristics and common query patterns. Requires the civicrm-mcp MCP server to be configured.
+description: Use when answering analytical or operational questions about a CiviCRM instance — members, contributions, events, contacts, activities. Provides workflow heuristics and common query patterns. Requires the civi-mcp MCP server to be configured.
 ---
 
 # CiviCRM
 
-A companion skill for the `civicrm-mcp` MCP server. The MCP server provides
+A companion skill for the `civi-mcp` MCP server. The MCP server provides
 typed tool contracts; this skill provides the agent's intuition for when
 to use them and how CiviCRM is structured.
 

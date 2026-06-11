@@ -1,4 +1,4 @@
-# `civicrm-mcp` Phase 1 Implementation Plan
+# `civi-mcp` Phase 1 Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -18,7 +18,7 @@ an env-gated integration test against a real CiviCRM site.
 `@modelcontextprotocol/sdk` 1.x, `zod` 3.23+, `pino` 9.x, `vitest` 2.x,
 `oxlint`, `oxfmt`, `prek`. Package manager: `pnpm` 9.x.
 
-**Source of truth:** `docs/superpowers/specs/2026-06-10-civicrm-mcp-server-design.md`.
+**Source of truth:** `docs/superpowers/specs/2026-06-10-civi-mcp-server-design.md`.
 
 ---
 
@@ -163,8 +163,8 @@ civi-mcp-server/
     ├── install-mcp.md
     ├── install-skill.md
     └── superpowers/
-        ├── specs/2026-06-10-civicrm-mcp-server-design.md
-        └── plans/2026-06-11-civicrm-mcp-phase-1.md   ← this file
+        ├── specs/2026-06-10-civi-mcp-server-design.md
+        └── plans/2026-06-11-civi-mcp-phase-1.md   ← this file
 ```
 
 ---
@@ -172,7 +172,7 @@ civi-mcp-server/
 ## Conventions used throughout this plan
 
 - **Branch:** All work happens on the existing feature branch
-  `docs/civicrm-mcp-design-spec` (rename later via merge to `main`). Never
+  `docs/civi-mcp-design-spec` (rename later via merge to `main`). Never
   commit to `main`. If on `main`, run `git checkout -b feat/<task-slug>`
   first.
 - **Conventional Commits** on every commit (`feat:`, `fix:`, `test:`,
@@ -208,7 +208,7 @@ civi-mcp-server/
 git branch --show-current
 ```
 
-Expected: `docs/civicrm-mcp-design-spec` (or you start a new branch off it
+Expected: `docs/civi-mcp-design-spec` (or you start a new branch off it
 with `git checkout -b feat/scaffolding`). If `main`, STOP and branch first.
 
 - [ ] **Step 2: Write `package.json`**
@@ -218,14 +218,14 @@ The versions below are minimums known to work; refresh them.
 
 ```jsonc
 {
-  "name": "civicrm-mcp",
+  "name": "civi-mcp",
   "version": "0.1.0",
   "description": "Model Context Protocol server for CiviCRM (APIv4).",
   "type": "module",
   "license": "MIT",
   "engines": { "node": ">=22.0.0" },
   "packageManager": "pnpm@9.12.0",
-  "bin": { "civicrm-mcp": "./dist/cli.js" },
+  "bin": { "civi-mcp": "./dist/cli.js" },
   "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -2462,7 +2462,7 @@ type AnyTool = {
 };
 
 export const buildServer = (client: Civi4Client, log: Logger): CiviMcpServer => {
-  const server = new McpServer({ name: "civicrm-mcp", version: "0.1.0" }) as CiviMcpServer;
+  const server = new McpServer({ name: "civi-mcp", version: "0.1.0" }) as CiviMcpServer;
   const registered: string[] = [];
 
   const register = (t: AnyTool): void => {
@@ -2558,7 +2558,7 @@ export type Logger = pino.Logger;
 
 export const createLogger = (level: "error" | "warn" | "info" | "debug"): Logger =>
   pino(
-    { level, base: { svc: "civicrm-mcp" } },
+    { level, base: { svc: "civi-mcp" } },
     pino.destination({ dest: 2, sync: false }), // 2 = stderr
   );
 ```
@@ -2603,7 +2603,7 @@ const main = async (): Promise<void> => {
   const cfg = loadConfig(process.env);
   const log = createLogger(cfg.logLevel);
 
-  log.info({ baseUrl: cfg.baseUrl.toString() }, "starting civicrm-mcp");
+  log.info({ baseUrl: cfg.baseUrl.toString() }, "starting civi-mcp");
 
   const client = new Civi4Client({
     baseUrl: cfg.baseUrl,
@@ -2731,7 +2731,7 @@ git commit -m "test(integration): live APIv4 smoke test (env-gated)"
 
 This task has **no code changes** — it's a manual verification step the
 spec's success criteria depend on. Document the result in
-`docs/superpowers/specs/2026-06-10-civicrm-mcp-server-design.md` under a
+`docs/superpowers/specs/2026-06-10-civi-mcp-server-design.md` under a
 new "Validation log" subsection once complete.
 
 - [ ] **Step 1: Configure Claude Desktop**
@@ -2803,12 +2803,12 @@ git commit -m "docs: record Phase 1 hands-on validation results"
 ```markdown
 ---
 name: civicrm
-description: Use when answering analytical or operational questions about a CiviCRM instance — members, contributions, events, contacts, activities. Provides workflow heuristics and common query patterns. Requires the civicrm-mcp MCP server to be configured.
+description: Use when answering analytical or operational questions about a CiviCRM instance — members, contributions, events, contacts, activities. Provides workflow heuristics and common query patterns. Requires the civi-mcp MCP server to be configured.
 ---
 
 # CiviCRM
 
-A companion skill for the `civicrm-mcp` MCP server. The MCP server provides
+A companion skill for the `civi-mcp` MCP server. The MCP server provides
 typed tool contracts; this skill provides the agent's intuition for when
 to use them and how CiviCRM is structured.
 
@@ -3126,13 +3126,13 @@ git commit -m "docs(skill): four worked example queries"
 ```markdown
 # Installing the CiviCRM skill
 
-This skill is the optional companion to the `civicrm-mcp` MCP server. The
+This skill is the optional companion to the `civi-mcp` MCP server. The
 MCP server gives the agent typed tool contracts; this skill gives it
 workflow heuristics and domain knowledge.
 
 ## Prerequisites
 
-- The `civicrm-mcp` MCP server is configured in your Claude Desktop /
+- The `civi-mcp` MCP server is configured in your Claude Desktop /
   Claude Code MCP config (see `docs/install-mcp.md` in this repo).
 - Claude Code is installed and looks at `~/.claude/skills/` by default.
 
@@ -3182,7 +3182,7 @@ server, the skill, or both.
 
 - Initial Phase 1 skill: workflow heuristics, mental model,
   pseudo-constant cheat-sheet, four worked examples.
-- **MCP version required:** civicrm-mcp 0.1.0 (the four Phase 1 tools).
+- **MCP version required:** civi-mcp 0.1.0 (the four Phase 1 tools).
 ```
 
 - [ ] **Step 3: Commit**
@@ -3275,7 +3275,7 @@ git commit -m "test(integration): assert skill markdown only references register
 - [ ] **Step 1: Write `docs/install-mcp.md`**
 
 ```markdown
-# Installing the civicrm-mcp server
+# Installing the civi-mcp server
 
 ## Prerequisites
 
@@ -3295,7 +3295,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`
   "mcpServers": {
     "civicrm": {
       "command": "npx",
-      "args": ["-y", "civicrm-mcp"],
+      "args": ["-y", "civi-mcp"],
       "env": {
         "CIVI_BASE_URL": "https://civi.example.org",
         "CIVI_API_KEY": "<your-personal-api-key>"
@@ -3316,7 +3316,7 @@ config file with the right schema. Run this in your project directory:
 claude mcp add civicrm \
   -e CIVI_BASE_URL=https://civi.example.org \
   -e CIVI_API_KEY=<your-personal-api-key> \
-  -- npx -y civicrm-mcp
+  -- npx -y civi-mcp
 ```
 
 `--scope local` is the default (per-project, written to `~/.claude.json`).
@@ -3400,7 +3400,7 @@ git commit -m "docs: MCP and skill install guides"
 - [ ] **Step 1: Write `README.md`**
 
 ```markdown
-# civicrm-mcp
+# civi-mcp
 
 A Model Context Protocol server for CiviCRM. Answer natural-language
 questions about your CRM ("how many life members signed up since
@@ -3412,7 +3412,7 @@ Phase 1 — read-only, four generic tools, single-tenant via personal API key.
 
 ## What's in this repo
 
-- `src/` — the TypeScript MCP server (published to npm as `civicrm-mcp`)
+- `src/` — the TypeScript MCP server (published to npm as `civi-mcp`)
 - `skills/civicrm/` — an optional Claude Code skill with workflow
   heuristics and worked examples
 - `docs/` — install guides and the design spec
@@ -3441,7 +3441,7 @@ queries. Pseudo-constants are surfaced so the agent can write
 `['status_id:name','=','Current']` rather than guessing numeric ids.
 Custom fields are discovered through introspection.
 
-See [the design spec](docs/superpowers/specs/2026-06-10-civicrm-mcp-server-design.md)
+See [the design spec](docs/superpowers/specs/2026-06-10-civi-mcp-server-design.md)
 for details.
 
 ## Development
@@ -3516,7 +3516,7 @@ Expected: pass.
 
 - [ ] **Step 5: Confirm success criteria from the spec**
 
-Walk through Section 14 of `docs/superpowers/specs/2026-06-10-civicrm-mcp-server-design.md`
+Walk through Section 14 of `docs/superpowers/specs/2026-06-10-civi-mcp-server-design.md`
 item by item. Tick each one off. If any fail, file an issue or add a
 failing test and fix.
 
@@ -3528,10 +3528,10 @@ git add docs/
 git commit -m "docs: complete Phase 1 success-criteria validation log"
 
 # Merge to main via PR
-gh pr create --title "feat: civicrm-mcp Phase 1" \
+gh pr create --title "feat: civi-mcp Phase 1" \
   --body "$(cat <<'EOF'
 ## Summary
-Phase 1 of the civicrm-mcp server: four generic MCP tools over CiviCRM APIv4
+Phase 1 of the civi-mcp server: four generic MCP tools over CiviCRM APIv4
 plus an optional Claude Code companion skill. Read-only; stdio transport;
 authx Bearer auth.
 
