@@ -14,7 +14,7 @@ describe("postJson", () => {
   it("issues a POST with Bearer auth and JSON body, returns parsed JSON", async () => {
     const fetcher = vi.fn<FetchFn>(async () => ok({ values: [{ id: 1 }], count: 1 }));
     const result = await postJson({
-      url: new URL("https://civi.example.org/civicrm/authx/api4/Contact/get"),
+      url: new URL("https://civi.example.org/civicrm/ajax/api4/Contact/get"),
       apiKey: "test-key",
       body: { params: { limit: 1 } },
       timeoutMs: 1000,
@@ -55,7 +55,7 @@ describe("postJson", () => {
       }),
     );
     const promise = postJson({
-      url: new URL("https://civi.example.org/civicrm/authx/api4/Contact/get"),
+      url: new URL("https://civi.example.org/civicrm/ajax/api4/Contact/get"),
       apiKey: "k",
       body: {},
       timeoutMs: 1000,

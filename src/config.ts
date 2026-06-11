@@ -7,7 +7,7 @@ const EnvSchema = z.object({
   CIVI_API_KEY: z
     .string({ error: "CIVI_API_KEY is required" })
     .min(1, "CIVI_API_KEY must not be empty"),
-  CIVI_AUTHX_PATH: z.string().default("/civicrm/authx/api4"),
+  CIVI_AUTHX_PATH: z.string().default("/civicrm/ajax/api4"),
   CIVI_TIMEOUT_MS: z
     .string()
     .default("30000")

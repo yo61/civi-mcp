@@ -9,7 +9,7 @@ describe("loadConfig", () => {
     });
     expect(cfg.baseUrl.toString()).toBe("https://civi.example.org/");
     expect(cfg.apiKey).toBe("secret-key");
-    expect(cfg.authxPath).toBe("/civicrm/authx/api4");
+    expect(cfg.authxPath).toBe("/civicrm/ajax/api4");
     expect(cfg.timeoutMs).toBe(30_000);
     expect(cfg.logLevel).toBe("error");
   });

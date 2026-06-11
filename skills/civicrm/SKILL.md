@@ -24,12 +24,12 @@ If the MCP server is unavailable (tool calls error with `CiviAuth` or
 
 ## The four Phase 1 tools
 
-| Tool | Purpose |
-|---|---|
-| `civicrm_list_entities` | Discover entities on this site (incl. extensions). Call once per session. |
+| Tool                      | Purpose                                                                                                                           |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `civicrm_list_entities`   | Discover entities on this site (incl. extensions). Call once per session.                                                         |
 | `civicrm_describe_entity` | Fields, pseudo-constants, actions, query hints for one entity. Call once per entity per session — results are cached server-side. |
-| `civicrm_get` | Query records: where, select, orderBy, limit. |
-| `civicrm_count` | Count records matching a where clause. Cheaper than `get` for "how many" questions. |
+| `civicrm_get`             | Query records: where, select, orderBy, limit.                                                                                     |
+| `civicrm_count`           | Count records matching a where clause. Cheaper than `get` for "how many" questions.                                               |
 
 ## Workflow heuristics
 
@@ -42,25 +42,27 @@ If the MCP server is unavailable (tool calls error with `CiviAuth` or
    category in plain English, use the `:name` or `:label` pseudo-constant
    suffix:
 
-   ```json
-   ["status_id:name", "=", "Current"]
-   ```
+    ```json
+    ["status_id:name", "=", "Current"]
+    ```
 
-   Not:
+    Not:
 
-   ```json
-   ["status_id", "=", 2]
-   ```
+    ```json
+    ["status_id", "=", 2]
+    ```
 
 5. **Always filter `is_deleted = 0`** when querying Contact-derived data
    unless the user explicitly asks for deleted records.
 6. **Joins via dot-notation in `select`**:
 
-   ```json
-   { "entity": "Contribution",
-     "select": ["total_amount", "contact_id.display_name"],
-     "where": [["receive_date", ">=", "2026-01-01"]] }
-   ```
+    ```json
+    {
+        "entity": "Contribution",
+        "select": ["total_amount", "contact_id.display_name"],
+        "where": [["receive_date", ">=", "2026-01-01"]]
+    }
+    ```
 
 ## CiviCRM mental model
 
@@ -84,13 +86,13 @@ If the MCP server is unavailable (tool calls error with `CiviAuth` or
 
 ## Pseudo-constant cheat-sheet
 
-| Field | What `:name` returns |
-|---|---|
-| `Membership.status_id` | "New", "Current", "Grace", "Expired", "Cancelled" |
-| `Contribution.contribution_status_id` | "Completed", "Pending", "Refunded", "Failed" |
-| `Activity.status_id` | "Scheduled", "Completed", "Cancelled" |
-| `Contact.contact_type` | "Individual", "Organization", "Household" |
-| `Participant.status_id` | "Registered", "Attended", "No-show", "Cancelled" |
+| Field                                 | What `:name` returns                              |
+| ------------------------------------- | ------------------------------------------------- |
+| `Membership.status_id`                | "New", "Current", "Grace", "Expired", "Cancelled" |
+| `Contribution.contribution_status_id` | "Completed", "Pending", "Refunded", "Failed"      |
+| `Activity.status_id`                  | "Scheduled", "Completed", "Cancelled"             |
+| `Contact.contact_type`                | "Individual", "Organization", "Household"         |
+| `Participant.status_id`               | "Registered", "Attended", "No-show", "Cancelled"  |
 
 Always call `civicrm_describe_entity` for the authoritative list — site
 admins can rename or add status values.

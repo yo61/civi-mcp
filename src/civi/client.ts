@@ -44,7 +44,7 @@ export class Civi4Client {
   constructor(options: Civi4ClientOptions) {
     this.#baseUrl = options.baseUrl;
     this.#apiKey = options.apiKey;
-    this.#authxPath = options.authxPath ?? "/civicrm/authx/api4";
+    this.#authxPath = options.authxPath ?? "/civicrm/ajax/api4";
     this.#timeoutMs = options.timeoutMs ?? 30_000;
     this.#fetcher = options.fetcher ?? fetch;
   }

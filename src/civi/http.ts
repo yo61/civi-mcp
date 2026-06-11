@@ -51,11 +51,29 @@ export const postJson = async <T>(input: PostJsonInput): Promise<T> => {
     });
   }
 
+  // Clone before reading so the catch path can still inspect the body — the
+  // original response is consumed by `.json()` whether it succeeds or throws.
+  const peek = response.clone();
   let parsed: unknown;
   try {
     parsed = await response.json();
   } catch (cause) {
-    throw new CiviTransportError("Response was not valid JSON", { cause });
+    // Capture a snippet of the body so future misconfigurations (wrong authx
+    // path → CiviCRM serves HTML dashboard; reverse proxy returning an error
+    // page; site in maintenance mode) surface as actionable messages instead
+    // of an opaque "not valid JSON".
+    let snippet = "";
+    try {
+      const text = await peek.text();
+      snippet = text.slice(0, 200).replace(/\s+/g, " ").trim();
+    } catch {
+      // ignore — clone body unreadable
+    }
+    const ct = response.headers.get("content-type") ?? "unknown";
+    const detail = snippet ? ` body starts with: ${snippet}` : "";
+    throw new CiviTransportError(`Response was not valid JSON (content-type: ${ct}).${detail}`, {
+      cause,
+    });
   }
 
   if (isErrorPayload(parsed)) {
