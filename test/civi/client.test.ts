@@ -130,3 +130,16 @@ describe("Civi4Client.get", () => {
     expect(Object.keys(body.params)).not.toContain("groupBy");
   });
 });
+
+describe("Civi4Client.count", () => {
+  it("requests select=[row_count] and returns the count", async () => {
+    const fetcher = mockFetch({ "Contact/get": { values: [{ row_count: 142 }], count: 142 } });
+    const client = new Civi4Client({ baseUrl, apiKey: asApiKey("k"), fetcher });
+    const result = await client.count("Contact", [["contact_type", "=", "Individual"]]);
+    expect(result.count).toBe(142);
+    const body = JSON.parse(fetcher.mock.calls[0]![1]?.body as string) as {
+      params: { select: string[] };
+    };
+    expect(body.params.select).toEqual(["row_count"]);
+  });
+});

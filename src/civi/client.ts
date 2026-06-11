@@ -19,6 +19,7 @@ import type {
   EntitySummary,
   Field,
   GetParams,
+  WhereClause,
 } from "./types.js";
 
 export type Civi4ClientOptions = {
@@ -89,6 +90,14 @@ export class Civi4Client {
     });
     const env = await this.#call<ApiV4Envelope<T>>(entity, "get", body);
     return { count: env.count ?? env.values.length, values: env.values };
+  }
+
+  async count(entity: string, where: readonly WhereClause[] = []): Promise<{ count: number }> {
+    const env = await this.#call<ApiV4Envelope<{ row_count: number }>>(entity, "get", {
+      where,
+      select: ["row_count"],
+    });
+    return { count: env.count ?? env.values[0]?.row_count ?? 0 };
   }
 
   async #call<T>(entity: string, action: string, params: Record<string, unknown>): Promise<T> {
