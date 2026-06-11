@@ -48,7 +48,3 @@ repos:
         entry: pnpm vitest run --exclude test/integration
         language: system
         pass_filenames: false
-        # TODO(task-3): remove `stages: [manual]` once the sanity test
-        # exists. vitest exits 1 when it finds no test files; this
-        # pin keeps prek green during early scaffolding tasks.
-        stages: [manual]
