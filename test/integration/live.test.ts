@@ -10,10 +10,14 @@ const ENABLED =
 const d = ENABLED ? describe : describe.skip;
 
 d("Civi4Client against a real Civi (env-gated)", () => {
-  const client = new Civi4Client({
-    baseUrl: new URL(process.env["CIVI_BASE_URL"]!),
-    apiKey: asApiKey(process.env["CIVI_API_KEY"]!),
-  });
+  // Lazy construction — describe body runs at discovery time even for
+  // describe.skip, so we can't unconditionally call `new URL(undefined)`.
+  const client = ENABLED
+    ? new Civi4Client({
+        baseUrl: new URL(process.env["CIVI_BASE_URL"]!),
+        apiKey: asApiKey(process.env["CIVI_API_KEY"]!),
+      })
+    : (undefined as unknown as Civi4Client);
 
   it("lists at least the Contact entity", async () => {
     const entities = await client.listEntities();
