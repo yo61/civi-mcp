@@ -124,12 +124,14 @@ them; until then YAGNI applies.
 ### 4.2 `civicrm_describe_entity`
 
 - **Args (zod):**
+
   ```ts
   {
     entity: z.string(),
     includeCustomFields: z.boolean().default(true)
   }
   ```
+
 - **Returns:** a compact document with everything the LLM needs to query the
   entity correctly:
 
@@ -193,6 +195,7 @@ const WhereClauseSchema: z.ZodType<WhereClause> = z.union([
 ```
 
 - **Args (zod):**
+
   ```ts
   {
     entity: z.string(),
@@ -204,6 +207,7 @@ const WhereClauseSchema: z.ZodType<WhereClause> = z.union([
     groupBy: z.array(z.string()).optional()
   }
   ```
+
 - **Returns:** `{ count: <returned>, values: [...] }`. Result count is bounded.
 - **Backing call:** `$Entity.get`.
 
