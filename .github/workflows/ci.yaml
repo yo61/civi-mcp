@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Runs the same hooks contributors run locally (.pre-commit-config.yaml), which
+  # is the whole quality gate for this repo: file hygiene, markdownlint, oxfmt,
+  # oxlint, tsc and the vitest suite.
+  #
+  # pnpm install comes first because the oxfmt/oxlint/tsc/vitest hooks are
+  # `language: system` — they shell out to pnpm and need node_modules present.
+  #
+  # commitlint is at the commit-msg stage and `prek run` skips it automatically.
+  # test:integration is excluded by the vitest hook and needs a live CiviCRM
+  # (CIVI_INTEGRATION=1), so it stays a local/manual step.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+        with:
+          prek-version: 0.4.13
+
+  # The gitleaks pre-commit hook runs `gitleaks git --pre-commit --staged`, which
+  # diffs the index against HEAD. On a fresh checkout those are identical, so the
+  # hook is a silent no-op under `prek run --all-files` and cannot gate anything.
+  # Scan the working tree explicitly instead.
+  #
+  # Uses the MIT-licensed CLI directly rather than gitleaks-action, which has been
+  # proprietary since v2.0.0 and requires a GITLEAKS_LICENSE secret for
+  # organisation accounts.
+  #
+  # The image is pinned by digest (= v8.30.1) for the same reason actions are
+  # pinned by SHA. Bump it alongside the gitleaks `rev:` in
+  # .pre-commit-config.yaml so local and CI scan with the same rules.
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Scan working tree for secrets
+        run: |
+          set -euo pipefail
+          docker run --rm -v "$PWD:/repo" \
+            ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            dir /repo --redact --verbose

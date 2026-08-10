@@ -1,6 +1,8 @@
 # `civi-mcp` Phase 1 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development
+> (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use
+> checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a TypeScript MCP server that exposes four generic tools
 (`civicrm_list_entities`, `civicrm_describe_entity`, `civicrm_get`,
@@ -196,6 +198,7 @@ civi-mcp-server/
 ### Task 1: package.json, tsconfig, lint/format configs
 
 **Files:**
+
 - Create: `package.json`
 - Create: `tsconfig.json`
 - Create: `.oxlintrc.json`
@@ -368,6 +371,7 @@ git commit -m "chore: scaffold package.json, tsconfig and lint/format configs"
 ### Task 2: Pre-commit hooks
 
 **Files:**
+
 - Create: `.pre-commit-config.yaml`
 
 - [ ] **Step 1: Look up current rev tags**
@@ -461,6 +465,7 @@ git commit -m "chore: add prek/pre-commit hooks with conventional commits and ma
 ### Task 3: vitest setup + sanity test
 
 **Files:**
+
 - Create: `vitest.config.ts`
 - Create: `test/sanity.test.ts`
 
@@ -520,6 +525,7 @@ git commit -m "test: configure vitest with a sanity test"
 ### Task 4: Config module (env → typed Config via zod)
 
 **Files:**
+
 - Create: `src/config.ts`
 - Test: `test/config.test.ts`
 
@@ -651,6 +657,7 @@ git commit -m "feat(config): parse and validate environment with zod"
 ### Task 5: Civi types
 
 **Files:**
+
 - Create: `src/civi/types.ts`
 
 (No direct test — these are type declarations exercised by later tests.)
@@ -772,6 +779,7 @@ git commit -m "feat(civi): add typed model for entities, fields and clauses"
 ### Task 6: Civi errors
 
 **Files:**
+
 - Create: `src/civi/errors.ts`
 - Test: `test/civi/errors.test.ts`
 
@@ -895,6 +903,7 @@ git commit -m "feat(civi): typed error hierarchy for auth, api and transport"
 ### Task 7: Civi HTTP wrapper
 
 **Files:**
+
 - Create: `src/civi/http.ts`
 - Test: `test/civi/http.test.ts`
 
@@ -1097,6 +1106,7 @@ git commit -m "feat(civi): typed POST helper with Bearer auth, timeout and error
 ### Task 8: Promise cache
 
 **Files:**
+
 - Create: `src/civi/cache.ts`
 - Test: `test/civi/cache.test.ts`
 
@@ -1206,6 +1216,7 @@ git commit -m "feat(civi): promise cache with single-flight and failure eviction
 ### Task 9: Civi4Client + listEntities
 
 **Files:**
+
 - Create: `src/civi/client.ts`
 - Create: `src/civi/index.ts`
 - Test: `test/civi/client.test.ts`
@@ -1394,6 +1405,7 @@ git commit -m "feat(civi): Civi4Client.listEntities with caching"
 ### Task 10: Civi4Client.describe
 
 **Files:**
+
 - Modify: `src/civi/client.ts` — add `describe()`
 - Test: `test/civi/client.test.ts` — add describe tests
 - Create: `test/helpers/fixtures/membership-getFields.json`
@@ -1623,6 +1635,7 @@ git commit -m "feat(civi): Civi4Client.describe with pseudoconstant and custom-f
 ### Task 11: Civi4Client.get
 
 **Files:**
+
 - Modify: `src/civi/client.ts` — add `get()`
 - Test: `test/civi/client.test.ts` — add get tests
 
@@ -1729,6 +1742,7 @@ git commit -m "feat(civi): Civi4Client.get with parameter stripping"
 ### Task 12: Civi4Client.count
 
 **Files:**
+
 - Modify: `src/civi/client.ts` — add `count()`
 - Test: `test/civi/client.test.ts` — add count tests
 
@@ -1794,6 +1808,7 @@ git commit -m "feat(civi): Civi4Client.count using row_count select"
 ### Task 13: where-schema (shared zod schema)
 
 **Files:**
+
 - Create: `src/mcp/tools/where-schema.ts`
 - Test: `test/mcp/where-schema.test.ts`
 
@@ -1882,6 +1897,7 @@ git commit -m "feat(mcp): recursive where-clause zod schema"
 ### Task 14: MCP tool — civicrm_list_entities
 
 **Files:**
+
 - Create: `src/mcp/tools/list-entities.ts`
 - Test: `test/mcp/list-entities.test.ts`
 
@@ -1966,6 +1982,7 @@ git commit -m "feat(mcp): civicrm_list_entities tool"
 ### Task 15: MCP tool — civicrm_describe_entity
 
 **Files:**
+
 - Create: `src/mcp/tools/describe-entity.ts`
 - Test: `test/mcp/describe-entity.test.ts`
 
@@ -2072,6 +2089,7 @@ git commit -m "feat(mcp): civicrm_describe_entity tool"
 ### Task 16: MCP tool — civicrm_get
 
 **Files:**
+
 - Create: `src/mcp/tools/get.ts`
 - Test: `test/mcp/get.test.ts`
 
@@ -2188,6 +2206,7 @@ git commit -m "feat(mcp): civicrm_get tool with bounded limit"
 ### Task 17: MCP tool — civicrm_count
 
 **Files:**
+
 - Create: `src/mcp/tools/count.ts`
 - Test: `test/mcp/count.test.ts`
 
@@ -2267,6 +2286,7 @@ git commit -m "feat(mcp): civicrm_count tool"
 ### Task 18: MCP server wiring with policy-based error wrapping
 
 **Files:**
+
 - Create: `src/mcp/server.ts`
 - Create: `src/mcp/index.ts`
 - Create: `src/mcp/errors-to-result.ts`
@@ -2522,6 +2542,7 @@ git commit -m "feat(mcp): server wiring with policy-based error-to-ToolResult ma
 ### Task 19: Logging — pino to stderr
 
 **Files:**
+
 - Create: `src/logging.ts`
 - Test: `test/logging.test.ts`
 
@@ -2583,6 +2604,7 @@ git commit -m "feat(logging): pino logger writing to stderr"
 ### Task 20: CLI bootstrap
 
 **Files:**
+
 - Modify: `src/cli.ts`
 
 This task has no unit test — it's an integration entry point. Verification
@@ -2658,6 +2680,7 @@ git commit -m "feat(cli): bootstrap MCP server over stdio"
 ### Task 21: Env-gated live integration test
 
 **Files:**
+
 - Create: `test/integration/live.test.ts`
 
 This test is **skipped** unless `CIVI_INTEGRATION=1` and credentials are
@@ -2766,6 +2789,7 @@ In a new Claude Desktop conversation, ask in order, and verify the answer:
 4. "What was the total of all completed contributions in May?"
 
 For each, capture:
+
 - Did the agent use pseudo-constant names (`status_id:name = ...`)?
 - How many MCP roundtrips did it take?
 - Was the final answer correct (cross-check against the Civi UI)?
@@ -2774,6 +2798,7 @@ For each, capture:
   integration test, then fix.**
 
 Examples of common Phase-1 issues you may encounter:
+
 - The agent guesses status ids rather than using `:name` suffix → tighten
   the `describe_entity` queryHints copy.
 - The agent forgets to filter `is_deleted = 0` → mention it in the skill
@@ -2796,6 +2821,7 @@ git commit -m "docs: record Phase 1 hands-on validation results"
 ### Task 23: SKILL.md scaffold
 
 **Files:**
+
 - Create: `skills/civicrm/SKILL.md`
 
 - [ ] **Step 1: Write `skills/civicrm/SKILL.md`**
@@ -2855,9 +2881,9 @@ If the MCP server is unavailable (tool calls error with `CiviAuth` or
    ["status_id", "=", 2]
    ```
 
-5. **Always filter `is_deleted = 0`** when querying Contact-derived data
+1. **Always filter `is_deleted = 0`** when querying Contact-derived data
    unless the user explicitly asks for deleted records.
-6. **Joins via dot-notation in `select`**:
+2. **Joins via dot-notation in `select`**:
 
    ```json
    { "entity": "Contribution",
@@ -2921,6 +2947,7 @@ See `examples/`:
 - `donations-by-month.md` — contribution totals grouped by month
 - `lapsed-members.md` — members whose `end_date` passed in the last N days
 - `recent-activity.md` — contacts with activities in the last week
+
 ```
 
 - [ ] **Step 2: Validate it parses as markdown**
@@ -2943,6 +2970,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
 ### Task 24: Skill examples
 
 **Files:**
+
 - Create: `skills/civicrm/examples/active-members.md`
 - Create: `skills/civicrm/examples/donations-by-month.md`
 - Create: `skills/civicrm/examples/lapsed-members.md`
@@ -2960,11 +2988,13 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
 1. **Describe `MembershipType`** to look up the type by name:
 
    ```
+
    civicrm_get(
      entity: "MembershipType",
      where: [["name","=","Lifetime"]],
      select: ["id","name"]
    )
+
    ```
 
 2. **Describe `Membership`** to confirm `status_id` pseudo-constant values.
@@ -2972,6 +3002,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
 3. **Count active memberships of that type:**
 
    ```
+
    civicrm_count(
      entity: "Membership",
      where: [
@@ -2979,6 +3010,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
        ["status_id:name","IN",["New","Current","Grace"]]
      ]
    )
+
    ```
 
 ## Notes
@@ -3004,6 +3036,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
 2. **Query, grouping by month:**
 
    ```
+
    civicrm_get(
      entity: "Contribution",
      where: [
@@ -3016,6 +3049,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
      orderBy: { "month": "ASC" },
      limit: 12
    )
+
    ```
 
 ## Notes
@@ -3041,6 +3075,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
 2. **Query:**
 
    ```
+
    civicrm_get(
      entity: "Membership",
      where: [
@@ -3052,6 +3087,7 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
      orderBy: { "end_date": "DESC" },
      limit: 100
    )
+
    ```
 
 ## Notes
@@ -3077,16 +3113,19 @@ git commit -m "feat(skill): SKILL.md with workflow heuristics and mental model"
 2. **Query distinct contacts with completed activities:**
 
    ```
+
    civicrm_get(
      entity: "Activity",
      where: [
        ["status_id:name","=","Completed"],
        ["activity_date_time",">=","<7-days-ago>"]
      ],
-     select: ["activity_contact.contact_id.display_name", "activity_date_time", "activity_type_id:label"],
+     select: ["activity_contact.contact_id.display_name", "activity_date_time",
+     "activity_type_id:label"],
      orderBy: { "activity_date_time": "DESC" },
      limit: 100
    )
+
    ```
 
 ## Notes
@@ -3118,6 +3157,7 @@ git commit -m "docs(skill): four worked example queries"
 ### Task 25: Skill INSTALL.md and CHANGELOG.md
 
 **Files:**
+
 - Create: `skills/civicrm/INSTALL.md`
 - Create: `skills/civicrm/CHANGELOG.md`
 
@@ -3168,6 +3208,7 @@ cp -r skills/civicrm ~/.claude/skills/civicrm
 
 The `CHANGELOG.md` in this directory records what changed and whether you
 need to also update the MCP server.
+
 ```
 
 - [ ] **Step 2: Write `skills/civicrm/CHANGELOG.md`**
@@ -3197,6 +3238,7 @@ git commit -m "docs(skill): install instructions and changelog"
 ### Task 26: Skill-consistency integration test
 
 **Files:**
+
 - Create: `test/integration/skill-consistency.test.ts`
 - Modify: `vitest.config.ts` if needed (this test runs in the integration
   group, but with no env vars required)
@@ -3269,6 +3311,7 @@ git commit -m "test(integration): assert skill markdown only references register
 ### Task 27: docs/install-mcp.md and docs/install-skill.md
 
 **Files:**
+
 - Create: `docs/install-mcp.md`
 - Create: `docs/install-skill.md`
 
@@ -3339,6 +3382,7 @@ file is for permissions, hooks, env vars, status line, and model
 selection. MCP server definitions live in `.mcp.json` / `~/.claude.json`
 as written by `claude mcp add`.
 
+<!-- markdownlint-disable-next-line MD024 -- 2nd embedded doc, own Verify -->
 ## Verify
 
 In your MCP client, run a tool listing — you should see
@@ -3356,6 +3400,7 @@ Try a small query: "How many contacts are in the database?"
 | `CIVI_AUTHX_PATH` | no | `/civicrm/ajax/api4` | Override for non-standard sites |
 | `CIVI_TIMEOUT_MS` | no | `30000` | HTTP request timeout |
 | `CIVI_LOG_LEVEL` | no | `error` | `error` \| `warn` \| `info` \| `debug` |
+
 ```
 
 - [ ] **Step 2: Write `docs/install-skill.md`**
@@ -3375,6 +3420,7 @@ cp -r skills/civicrm ~/.claude/skills/civicrm
 ```
 
 Then check `/skills` in Claude Code lists `civicrm`.
+
 ```
 
 - [ ] **Step 3: Lint markdown**
@@ -3395,6 +3441,7 @@ git commit -m "docs: MCP and skill install guides"
 ### Task 28: README.md
 
 **Files:**
+
 - Create: `README.md`
 
 - [ ] **Step 1: Write `README.md`**
@@ -3457,6 +3504,7 @@ pnpm verify              # format + lint + typecheck + test
 ## Licence
 
 MIT.
+
 ```
 
 - [ ] **Step 2: Lint markdown**
