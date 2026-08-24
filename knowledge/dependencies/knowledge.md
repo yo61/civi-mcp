@@ -2,23 +2,28 @@
 
 Confirmed facts about how dependency changes get validated in this repo.
 
-## F1: The `lint` job is the whole gate, and it does not run `pnpm build`
+## F1: The `lint` job covers far more than its name
 
 `.github/workflows/ci.yaml` has two jobs, `lint` and `secrets`. `lint`
 runs prek over `.pre-commit-config.yaml`, whose `local` hooks shell out
 to `pnpm oxfmt --check`, `pnpm oxlint`, `pnpm typecheck` (`tsc
---noEmit`) and `pnpm vitest run --exclude test/integration`.
+--noEmit`) and `pnpm vitest run --exclude test/integration`, and then
+runs `pnpm build` as an explicit step.
 
-So a green `lint` means format, lint, typecheck and the unit suite all
-passed — considerably more than the job name suggests.
+So a green `lint` means format, lint, typecheck, the unit suite and emit
+all passed — considerably more than the job name suggests. It is also
+the only required check that gates anything about the code, so whatever
+is not in this job is not gated at all.
 
-What it does *not* cover is `pnpm build` (`tsc -p tsconfig.build.json`),
-which is the only thing that exercises emit. Nothing in CI runs it. The
-first gate that does is `prepublishOnly` (`pnpm verify && pnpm build`),
-so a regression affecting only code generation would surface at publish
-time rather than on the PR that introduced it.
+The build step sits outside the hooks deliberately. `pnpm typecheck`
+uses `tsconfig.json` (src + test, `--noEmit`); `pnpm build` uses
+`tsconfig.build.json` (src only, emits `dist/`). Type-checking cannot
+tell you emit works, and `dist/cli.js` is what this package ships as its
+`bin`. The step was missing until 2026-08-24 — until then the first
+thing to run a build was `prepublishOnly`, so a codegen regression would
+have surfaced at release rather than on the PR that introduced it.
 
-**Confirmed:** 2026-08-24, merging #14.
+**Confirmed:** 2026-08-24, merging #14; build step added the same day.
 
 ## F2: Required checks are non-strict — a PR can merge without seeing current `main`
 

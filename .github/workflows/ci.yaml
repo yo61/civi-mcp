@@ -9,9 +9,9 @@ permissions:
   contents: read
 
 jobs:
-  # Runs the same hooks contributors run locally (.pre-commit-config.yaml), which
-  # is the whole quality gate for this repo: file hygiene, markdownlint, oxfmt,
-  # oxlint, tsc and the vitest suite.
+  # Runs the same hooks contributors run locally (.pre-commit-config.yaml) —
+  # file hygiene, markdownlint, oxfmt, oxlint, tsc and the vitest suite — plus
+  # a build step the hooks deliberately don't cover (see below).
   #
   # pnpm install comes first because the oxfmt/oxlint/tsc/vitest hooks are
   # `language: system` — they shell out to pnpm and need node_modules present.
@@ -34,6 +34,19 @@ jobs:
       - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
         with:
           prek-version: 0.4.13
+
+      # The tsc hook runs `tsc --noEmit` against tsconfig.json (src + test), so
+      # it type-checks but never exercises emit. tsconfig.build.json is the
+      # other half: src only, `noEmit: false`, and it produces the dist/cli.js
+      # this package ships as its `bin`. Without this step the first thing to
+      # run it is `prepublishOnly`, i.e. a codegen regression would surface at
+      # release rather than on the PR that caused it.
+      #
+      # Not a prek hook: a full emit pass on every local commit mostly repeats
+      # work the --noEmit hook already did, and the risk it covers is
+      # release-shaped, so CI is where it earns its keep.
+      - name: Build (verifies emit, which `tsc --noEmit` cannot)
+        run: pnpm build
 
   # The gitleaks pre-commit hook runs `gitleaks git --pre-commit --staged`, which
   # diffs the index against HEAD. On a fresh checkout those are identical, so the
