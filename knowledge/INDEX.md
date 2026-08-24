@@ -8,6 +8,8 @@ for details.
 
 - [Architecture](architecture/) — high-level design decisions, hypotheses
   about generalisation, patterns we're trying.
+- [Dependencies](dependencies/) — what CI actually covers, and the
+  checks worth running before merging a bump.
 
 ## How this works
 
