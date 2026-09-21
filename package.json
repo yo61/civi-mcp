@@ -50,8 +50,8 @@
   "devDependencies": {
     "@anthropic-ai/mcpb": "^2.1.2",
     "@types/node": "^26.1.2",
-    "oxfmt": "0.67.0",
-    "oxlint": "1.82.0",
+    "oxfmt": "0.68.0",
+    "oxlint": "1.83.0",
     "tsx": "^4.22.4",
     "typescript": "^7.0.2",
     "vitest": "^5.0.0"
