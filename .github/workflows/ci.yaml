@@ -48,6 +48,13 @@ jobs:
       - name: Build (verifies emit, which `tsc --noEmit` cannot)
         run: pnpm build
 
+      # Reads the npm advisory database directly: this repository's dependency
+      # graph indexes no manifests, so Dependabot raises no alerts here.
+      # --prod gates what the published package ships; dev-tool advisories
+      # (e.g. mcpb's node-forge, which has no fixed release) do not block.
+      - name: Audit production dependencies
+        run: pnpm audit --prod --audit-level=moderate
+
   # The gitleaks pre-commit hook runs `gitleaks git --pre-commit --staged`, which
   # diffs the index against HEAD. On a fresh checkout those are identical, so the
   # hook is a silent no-op under `prek run --all-files` and cannot gate anything.
