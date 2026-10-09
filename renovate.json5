@@ -1,0 +1,65 @@
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+
+  // Two bots update this repository, each owning different pins. Dependabot keeps npm, the
+  // workflows' action SHAs and the pre-commit hooks (.github/dependabot.yml). Renovate owns the
+  // runner image, the annotated *_VERSION values in the workflows, and packageManager's pnpm in
+  // package.json, which CI's pnpm/action-setup reads. enabledManagers keeps it off everything
+  // Dependabot owns; github-actions runs only for runner images and npm only for
+  // packageManager. Renovate runs from yo61/infrastructure's workflow, whose cron is the only
+  // schedule; do not add a `schedule`.
+  //
+  // Floating on purpose: .claude-plugin/plugin.json runs `npx -y civi-mcp` unversioned, so the
+  // plugin always starts this project's latest npm release.
+  extends: ["config:recommended", "customManagers:githubActionsVersions"],
+  enabledManagers: ["github-actions", "npm", "custom.regex"],
+
+  // Policy shared by every repository Renovate updates; keep the copies alike.
+  semanticCommits: "enabled",
+  dependencyDashboard: true,
+  minimumReleaseAge: "7 days",
+  minimumReleaseAgeBehaviour: "timestamp-optional",
+  prHourlyLimit: 0,
+  prConcurrentLimit: 10,
+  osvVulnerabilityAlerts: true,
+  vulnerabilityAlerts: {
+    semanticCommitType: "fix",
+    labels: ["security"],
+  },
+
+  packageRules: [
+    {
+      matchUpdateTypes: ["major"],
+      minimumReleaseAge: "14 days",
+    },
+    {
+      // Action SHAs are Dependabot's; only runs-on images are Renovate's.
+      matchManagers: ["github-actions"],
+      matchDatasources: ["!github-runners"],
+      enabled: false,
+    },
+    {
+      // npm dependencies are Dependabot's; only packageManager's pnpm is Renovate's.
+      matchManagers: ["npm"],
+      matchDepTypes: ["!packageManager"],
+      enabled: false,
+    },
+    {
+      matchManagers: ["npm"],
+      matchDepTypes: ["packageManager"],
+      semanticCommitType: "chore",
+      groupName: "pnpm",
+    },
+    {
+      // CI tests on the oldest Node that package.json's engines (>=22.0.0) supports. Raise the
+      // two together by hand when the floor moves.
+      matchDepNames: ["node"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
+    },
+    {
+      matchFileNames: [".github/workflows/**"],
+      semanticCommitScope: "ci",
+    },
+  ],
+}
