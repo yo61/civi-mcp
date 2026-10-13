@@ -36,7 +36,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+      - uses: j178/prek-action@1382ad72dea72f9d53832f2bcb65b3e87a947204 # v3.0.1
         env:
           # renovate: datasource=github-releases depName=j178/prek extractVersion=^v(?<version>.+)$
           PREK_VERSION: 0.5.4
@@ -81,7 +81,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Scan working tree for secrets
-        uses: j178/prek-action@4e14d07f9231acabce116ccfca13b13dd9755ece # v3.0.0
+        uses: j178/prek-action@1382ad72dea72f9d53832f2bcb65b3e87a947204 # v3.0.1
         env:
           # renovate: datasource=github-releases depName=j178/prek extractVersion=^v(?<version>.+)$
           PREK_VERSION: 0.5.4
