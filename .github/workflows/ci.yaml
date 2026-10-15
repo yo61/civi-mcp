@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   # Runs the same hooks contributors run locally (.pre-commit-config.yaml) —
   # file hygiene, markdownlint, oxfmt, oxlint, tsc and the vitest suite — plus
@@ -21,6 +25,7 @@ jobs:
   # (CIVI_INTEGRATION=1), so it stays a local/manual step.
   lint:
     runs-on: ubuntu-26.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -76,6 +81,7 @@ jobs:
   # organisation accounts.
   secrets:
     runs-on: ubuntu-26.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
