@@ -65,3 +65,25 @@ complete compiler reimplementation, so a future TypeScript bump that
 *does* move `.js` output is worth reading rather than waving through.
 
 **Confirmed:** 2026-08-24, PR #14.
+
+## F4: The audit step gates only production deps, and fails on base-branch drift
+
+The `lint` job runs `pnpm audit --prod --audit-level=moderate`. Advisories
+published against an unchanged lockfile turn that step red on `main` and
+on *every* open PR at once, regardless of what each PR changes. When all
+open Dependabot PRs fail `lint` on the same step, suspect `main`, not the
+PRs: fix it in one lockfile PR on `main`, then `@dependabot rebase` each
+PR.
+
+When the vulnerable package is transitive and its patched version sits
+inside the parent's declared range, `pnpm update --depth Infinity <pkg>`
+re-resolves it without `overrides`. Expect a few unrelated patch bumps
+from the re-resolve; read the lockfile diff's package keys before
+committing.
+
+Dev-only advisories (vite under vitest, node-forge/tmp/zod under
+`@anthropic-ai/mcpb`) are not gated and accumulate silently. Run
+`pnpm audit` without `--prod` to see them.
+
+**Confirmed:** 2026-11-17, PR #54 (hono / @hono/node-server under
+`@modelcontextprotocol/sdk`, blocking #51–#53).
